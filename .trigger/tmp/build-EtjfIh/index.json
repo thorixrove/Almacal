@@ -1,0 +1,55 @@
+{
+  "configPath": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-EtjfIh\\OneDrive\\Desktop\\almacal\\trigger.config.mjs",
+  "customConditions": [
+  ],
+  "prompts": [
+  ],
+  "queues": [
+  ],
+  "runtime": "node",
+  "runtimeVersion": "22.14.0",
+  "skills": [
+  ],
+  "tasks": [
+    {
+      "entryPoint": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-EtjfIh\\OneDrive\\Desktop\\almacal\\src\\trigger\\clerk-users.mjs",
+      "filePath": "src/trigger/clerk-users.ts",
+      "id": "clerk-user-created",
+      "maxDuration": 60,
+      "retry": {
+        "factor": 2,
+        "maxAttempts": 3,
+        "maxTimeoutInMs": 10000,
+        "minTimeoutInMs": 1000
+      }
+    },
+    {
+      "entryPoint": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-EtjfIh\\OneDrive\\Desktop\\almacal\\src\\trigger\\clerk-users.mjs",
+      "filePath": "src/trigger/clerk-users.ts",
+      "id": "clerk-user-updated",
+      "maxDuration": 60,
+      "retry": {
+        "factor": 2,
+        "maxAttempts": 3,
+        "maxTimeoutInMs": 10000,
+        "minTimeoutInMs": 1000
+      }
+    },
+    {
+      "entryPoint": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-EtjfIh\\OneDrive\\Desktop\\almacal\\src\\trigger\\clerk-users.mjs",
+      "filePath": "src/trigger/clerk-users.ts",
+      "id": "clerk-user-deleted",
+      "maxDuration": 60,
+      "retry": {
+        "factor": 2,
+        "maxAttempts": 3,
+        "maxTimeoutInMs": 10000,
+        "minTimeoutInMs": 1000
+      }
+    }
+  ],
+  "timings": {
+    "src/trigger/clerk-users.ts": 88.4531
+  },
+  "workerEntryPoint": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-EtjfIh\\AppData\\Local\\npm-cache\\_npx\\f51a09bd0abf5f10\\node_modules\\trigger.dev\\dist\\esm\\entryPoints\\dev-run-worker.mjs"
+}

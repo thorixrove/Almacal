@@ -1,0 +1,372 @@
+{
+  "id": "f31c0fd9-9d22-4bfe-a3cb-bf492f6a72e4",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.meals": {
+      "name": "meals",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "imageUrl": {
+          "name": "imageUrl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "meal_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'analyzing'"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "calories": {
+          "name": "calories",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "proteinG": {
+          "name": "proteinG",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "carbsG": {
+          "name": "carbsG",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fatG": {
+          "name": "fatG",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "errorReason": {
+          "name": "errorReason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "triggerRunId": {
+          "name": "triggerRunId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "loggedAt": {
+          "name": "loggedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "meals_user_logged_at_idx": {
+          "name": "meals_user_logged_at_idx",
+          "columns": [
+            {
+              "expression": "userId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "loggedAt",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "meals_userId_users_id_fk": {
+          "name": "meals_userId_users_id_fk",
+          "tableFrom": "meals",
+          "tableTo": "users",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "clerkUserId": {
+          "name": "clerkUserId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "timezone": {
+          "name": "timezone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "unitPreference": {
+          "name": "unitPreference",
+          "type": "unit_preference",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gender": {
+          "name": "gender",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dateOfBirth": {
+          "name": "dateOfBirth",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "heightCm": {
+          "name": "heightCm",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "weightKg": {
+          "name": "weightKg",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "goal": {
+          "name": "goal",
+          "type": "goal",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "targetWeightKg": {
+          "name": "targetWeightKg",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "activityLevel": {
+          "name": "activityLevel",
+          "type": "activity_level",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "paceKgPerWeek": {
+          "name": "paceKgPerWeek",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dietPreference": {
+          "name": "dietPreference",
+          "type": "diet_preference",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dailyCalories": {
+          "name": "dailyCalories",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "proteinG": {
+          "name": "proteinG",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "carbsG": {
+          "name": "carbsG",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fatG": {
+          "name": "fatG",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "planRationale": {
+          "name": "planRationale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "planGeneratedAt": {
+          "name": "planGeneratedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "onboardingCompletedAt": {
+          "name": "onboardingCompletedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_clerkUserId_unique": {
+          "name": "users_clerkUserId_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "clerkUserId"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.activity_level": {
+      "name": "activity_level",
+      "schema": "public",
+      "values": [
+        "sedentary",
+        "light",
+        "moderate",
+        "very",
+        "extra"
+      ]
+    },
+    "public.diet_preference": {
+      "name": "diet_preference",
+      "schema": "public",
+      "values": [
+        "classic",
+        "keto",
+        "vegan",
+        "vegetarian"
+      ]
+    },
+    "public.goal": {
+      "name": "goal",
+      "schema": "public",
+      "values": [
+        "lose",
+        "maintain",
+        "gain"
+      ]
+    },
+    "public.meal_status": {
+      "name": "meal_status",
+      "schema": "public",
+      "values": [
+        "analyzing",
+        "completed",
+        "failed"
+      ]
+    },
+    "public.unit_preference": {
+      "name": "unit_preference",
+      "schema": "public",
+      "values": [
+        "metric",
+        "imperial"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

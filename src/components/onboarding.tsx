@@ -2,8 +2,8 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SymbolView, type SFSymbol } from 'expo-symbols';
 import type { ReactNode } from 'react';
-import { useRef } from 'react';
-import { Pressable, ScrollView, Text, View, type NativeSyntheticEvent } from 'react-native';
+import { useState } from 'react';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const SEGMENTS = 4;
@@ -63,7 +63,14 @@ export function OnboardingScreen({
             ) : null}
             {header}
 
-            <View className="flex-1">{children}</View>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                bounces={false}
+                contentContainerStyle={{ flexGrow: 1, paddingBottom: 18 }}
+                className="flex-1"
+            >
+                {children}
+            </ScrollView>
 
             <Pressable
                 onPress={onNext}
@@ -96,30 +103,33 @@ export function OptionCard({
     return (
         <Pressable
             onPress={onPress}
+            className={`flex-row items-center rounded-[18px] px-[18px] py-[16px] ${selected ? 'border-[2px] border-black bg-white' : 'border border-[#EDEDEF] bg-[#F5F5F6]'}`}
             style={{
-                minHeight: tall ? 96 : 70,
-                borderWidth: selected ? 2 : 1,
-                borderColor: selected ? '#000000' : '#EDEDEF',
+                minHeight: tall ? 96 : 72,
             }}
         >
-            <View className={`items-center ${tall ? 'w-[48px]' : 'w-[32px]'}`}>
+            <View className={`items-center justify-center ${tall ? 'h-[52px] w-[52px]' : 'h-[42px] w-[42px]'}`}>
                 {glyph ? (
-                    <Text className="text-[46px] leading-[54px] text-black">{glyph}</Text>
+                    <Text style={{ fontSize: 24, lineHeight: 28, includeFontPadding: false }}>
+                        {glyph}
+                    </Text>
                 ) : icon ? (
-                    <SymbolView name={icon} size={tall ? 36 : 29} weight="regular" tintColor="#000000" />
+                    <SymbolView name={icon} size={tall ? 28 : 24} weight="regular" tintColor="#000000" />
                 ) : null}
             </View>
-            <View className="ml-[20px] flex-1">
-                <Text className="text-[16px] font-semibold leading-[21px] text-black">{title}</Text>
+            <View className="ml-[14px] flex-1">
+                <Text className="text-[17px] font-semibold leading-[22px] text-black">{title}</Text>
                 {subtitle ? (
                     <Text className="mt-[2px] text-[14px] leading-[19px] text-[#6E6E78]">{subtitle}</Text>
                 ) : null}
             </View>
-            {selected ? (
-                <View className="h-[24px] w-[24px] items-center justify-center rounded-full bg-black">
-                    <SymbolView name="checkmark" size={13} weight="bold" tintColor="#FFFFFF" />
-                </View>
-            ) : null}
+            <View
+                className={`h-[22px] w-[22px] items-center justify-center rounded-full ${selected ? 'bg-black' : 'border border-[#C8C8CC] bg-white'}`}
+            >
+                {selected ? (
+                    <SymbolView name="checkmark" size={11} weight="bold" tintColor="#FFFFFF" />
+                ) : null}
+            </View>
         </Pressable>
     )
 }
@@ -138,8 +148,6 @@ export function RulerPicker({
     increment,
     decimals = 0,
     unit,
-    labelEvery = 5,
-    labelDecimals = 0,
 }: {
     value: number;
     onChange: (v: number) => void;
@@ -151,94 +159,57 @@ export function RulerPicker({
     labelEvery?: number;
     labelDecimals?: number;
 }) {
-    const count = Math.round((max - min) / increment) + 1
-    const height = ITEM * VISIBLE
-    const pad = height / 2 - ITEM / 2
-    const last = useRef(value)
-    const centerIndex = Math.round((max - value) / increment)
+    const [trackWidth, setTrackWidth] = useState(0)
+    const safeRange = Math.max(max - min, increment)
+    const percent = Math.min(100, Math.max(0, ((value - min) / safeRange) * 100))
 
+    const updateFromTouch = (x: number) => {
+        if (!trackWidth) return
 
-    const onScroll = (e: NativeSyntheticEvent<{ contentOffset: { y: number } }>) => {
-        const i = Math.round(e.nativeEvent.contentOffset.y / ITEM)
-        const v = Math.min(max, Math.max(min, max - i * increment))
-        const rounded = Number(v.toFixed(decimals + 1))
-        if (rounded !== last.current) {
-            last.current = rounded
+        const clampedX = Math.min(trackWidth, Math.max(0, x))
+        const ratio = clampedX / trackWidth
+        const raw = min + ratio * (max - min)
+        const snapped = Math.round(raw / increment) * increment
+        const next = Math.min(max, Math.max(min, snapped))
+        const rounded = Number(next.toFixed(decimals + 1))
+
+        if (rounded !== value) {
             onChange(rounded)
         }
     }
 
-
     return (
-        <View className="flex-row items-end justify-center">
-            <View className="text-[42px] font-bold leading-[46px] text-black">
-                <Text>
+        <View className="items-center justify-center">
+            <View className="flex-row items-end justify-center">
+                <Text className="text-[44px] font-bold leading-[48px] text-black">
                     {value.toFixed(decimals)}
                 </Text>
-                <Text className="mb-[7px] ml-[8px] text-[17px] leading-[20px] text-[#6E6E78]">{unit}</Text>
+                <Text className="mb-[10px] ml-[12px] text-[18px] leading-[20px] text-[#6E6E78]">
+                    {unit}
+                </Text>
             </View>
 
-            <View className="mt-[26px]" style={{ height }}>
-                <ScrollView
-                    showsVerticalScrollIndicator={false}
-                    snapToInterval={ITEM}
-                    decelerationRate="fast"
-                    scrollEventThrottle={16}
-                    onScroll={onScroll}
-                    contentOffset={{ x: 0, y: Math.round((max - value) / increment) * ITEM }}
-                    contentContainerStyle={{ paddingVertical: pad }}>
-                    {Array.from({ length: count }, (_, i) => {
-                        const v = Number((max - i * increment).toFixed(decimals + 1))
-                        const major = i % labelEvery === 0
-                        const showLabel = major && Math.abs(i - centerIndex) > 1
-                        return (
-                            <View key={i} className="justify-center" style={{ height: ITEM }}>
-                                <View
-                                    className="absolute left-1/2 rounded-full"
-                                    style={{
-                                        marginLeft: major ? -13 : -9,
-                                        width: major ? 26 : 18,
-                                        height: major ? 2 : 1.5,
-                                        backgroundColor: major ? '#C9C9CE' : '#DEDEE2',
-                                    }}
-                                />
-                                {showLabel ? (
-                                    <Text
-                                        className="absolute text-[17px] leading-[20px] text-[#9A9AA0]"
-                                        style={{ left: '50%', marginLeft: 94, top: -3 }}
-                                    >
-                                        {v.toFixed(labelDecimals)}
-                                    </Text>
-                                ) : null}
-                            </View>
-                        )
-                    })}
-                </ScrollView>
-
-                {FADE.map((o, i) => (
-                    <View key={`t${i}`} pointerEvents="none" style={fadeStyle(i * 7, o)} />
-                ))}
-                {FADE.map((o, i) => (
-                    <View key={`b${i}`} pointerEvents="none" style={fadeStyle(height - (i + 1) * 7, o)} />
-                ))}
-
-                <View pointerEvents="none" className="absolute left-0 right-0" style={{ top: pad }}>
-                    <View className="h-[14px] justify-center">
-                        <View
-                            className="absolute h-[2px] bg-black"
-                            style={{ left: '50%', marginLeft: -87, width: 174 }}
-                        />
-                        <View
-                            className="absolute h-[26px] w-[26px] rounded-full bg-black"
-                            style={{ left: '50%', marginLeft: -13 }}
-                        />
-                        <Text
-                            className="absolute text-[17px] font-semibold leading-[20px] text-black"
-                            style={{ left: '50%', marginLeft: 94 }}
-                        >
-                            {value % 1 === 0 ? String(value) : value.toFixed(decimals)}
-                        </Text>
-                    </View>
+            <View className="mt-[18px] w-full items-center">
+                <View
+                    className="h-[32px] w-[84%] max-w-[320px] justify-center"
+                    onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}
+                    onStartShouldSetResponder={() => true}
+                    onMoveShouldSetResponder={() => true}
+                    onResponderGrant={(e) => updateFromTouch(e.nativeEvent.locationX)}
+                    onResponderMove={(e) => updateFromTouch(e.nativeEvent.locationX)}
+                >
+                    <View className="absolute left-0 right-0 top-[15px] h-[2px] bg-[#D9D9DA]" />
+                    <View
+                        className="absolute top-[15px] h-[2px] bg-black"
+                        style={{ left: 0, width: `${percent}%` }}
+                    />
+                    <View
+                        className="absolute top-[6px] h-[20px] w-[20px] rounded-full bg-black"
+                        style={{
+                            left: `${percent}%`,
+                            transform: [{ translateX: -10 }],
+                        }}
+                    />
                 </View>
             </View>
         </View>

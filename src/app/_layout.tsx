@@ -30,17 +30,17 @@ Sentry.init({
   // The SDK would default this to "development" on a dev build, which the dashboard's
   // environment filter hides unless you switch it. Explicit so it's visible in the UI.
   environment: __DEV__ ? "development" : "production",
-  // logs every envelope it sends to the Metro console — the only way to tell "the SDK
-  // never sent it" apart from "the dashboard is filtering it out"
-  debug: __DEV__,
+  // Disable noisy native log capture on dev builds; this can trigger filesystem errors on
+  // some Android/dev-client setups and is not needed for the app's crash reporting.
+  debug: false,
   sendDefaultPii: true,
-  enableLogs: true,
+  enableLogs: false,
   // ponytail: sample everything while the app is small; drop to ~0.1 once traffic costs quota
   tracesSampleRate: 1.0,
   profilesSampleRate: 1.0,
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
-  enableNativeFramesTracking: !isRunningInExpoGo(),
+  enableNativeFramesTracking: false,
   integrations: [
     Sentry.mobileReplayIntegration({
       maskAllImages: false,

@@ -1,3 +1,6 @@
+import type { ComponentProps } from 'react';
+
+import type { Ionicons } from '@react-native-vector-icons/ionicons/static';
 import type { SFSymbol } from 'expo-symbols';
 
 import type { Plan, PlanInput } from '@/lib/plan';
@@ -21,7 +24,14 @@ export const answers: Partial<Answers> = {
  */
 export const draft: { plan?: Plan } = {};
 
-type Option = { value: string; title: string; subtitle?: string; icon?: SFSymbol; glyph?: string };
+type Option = {
+    value: string;
+    title: string;
+    subtitle?: string;
+    icon?: SFSymbol;
+    glyph?: string;
+    vectorIcon?: ComponentProps<typeof Ionicons>['name'];
+};
 
 type Base = { key: string; field: keyof Answers; title: string; subtitle: string };
 
@@ -51,8 +61,8 @@ export const steps: Step[] = [
         title: "Let's get to know you better",
         subtitle: 'This helps us personalize your plan and recommendations.',
         options: [
-            { value: 'male', title: 'Male', glyph: '♂' },
-            { value: 'female', title: 'Female', glyph: '♀' },
+            { value: 'male', title: 'Male', vectorIcon: 'male' },
+            { value: 'female', title: 'Female', vectorIcon: 'female' },
         ],
     },
     {
@@ -97,19 +107,19 @@ export const steps: Step[] = [
                 value: 'lose',
                 title: 'Lose weight',
                 subtitle: 'Shed fat at a steady pace',
-                icon: 'chart.line.downtrend.xyaxis',
+                vectorIcon: 'trending-down',
             },
             {
                 value: 'maintain',
                 title: 'Maintain weight',
                 subtitle: 'Stay where you are',
-                icon: 'chart.line.flattrend.xyaxis',
+                vectorIcon: 'swap-horizontal',
             },
             {
                 value: 'gain',
                 title: 'Gain weight',
                 subtitle: 'Build size and strength',
-                icon: 'chart.line.uptrend.xyaxis',
+                vectorIcon: 'trending-up',
             },
         ],
     },
@@ -133,25 +143,25 @@ export const steps: Step[] = [
         title: 'How active are you during the day?',
         subtitle: 'This helps us estimate your daily calorie needs.',
         options: [
-            { value: 'sedentary', title: 'Sedentary', subtitle: 'Little or no exercise', icon: 'sofa' },
+            { value: 'sedentary', title: 'Sedentary', subtitle: 'Little or no exercise', vectorIcon: 'bed' },
             {
                 value: 'light',
                 title: 'Lightly active',
                 subtitle: '1–3 days per week',
-                icon: 'figure.walk',
+                vectorIcon: 'walk',
             },
             {
                 value: 'moderate',
                 title: 'Moderately active',
                 subtitle: '3–5 days per week',
-                icon: 'dumbbell',
+                vectorIcon: 'barbell',
             },
-            { value: 'very', title: 'Very active', subtitle: '6–7 days per week', icon: 'figure.run' },
+            { value: 'very', title: 'Very active', subtitle: '6–7 days per week', vectorIcon: 'flash' },
             {
                 value: 'extra',
                 title: 'Extra active',
                 subtitle: 'Very intense daily activity or physical job',
-                icon: 'flame',
+                vectorIcon: 'flame',
             },
         ],
     },
@@ -178,10 +188,10 @@ export const steps: Step[] = [
         title: 'Any diet preference?',
         subtitle: 'We shape your macro split around how you like to eat.',
         options: [
-            { value: 'classic', title: 'Classic', subtitle: 'A bit of everything', icon: 'fork.knife' },
-            { value: 'keto', title: 'Keto', subtitle: 'Low carb, high fat', icon: 'flame' },
-            { value: 'vegan', title: 'Vegan', subtitle: 'No animal products', icon: 'leaf' },
-            { value: 'vegetarian', title: 'Vegetarian', subtitle: 'No meat or fish', icon: 'carrot' },
+            { value: 'classic', title: 'Classic', subtitle: 'A bit of everything', vectorIcon: 'restaurant' },
+            { value: 'keto', title: 'Keto', subtitle: 'Low carb, high fat', vectorIcon: 'flame' },
+            { value: 'vegan', title: 'Vegan', subtitle: 'No animal products', vectorIcon: 'leaf' },
+            { value: 'vegetarian', title: 'Vegetarian', subtitle: 'No meat or fish', vectorIcon: 'nutrition' },
         ],
     },
 ];

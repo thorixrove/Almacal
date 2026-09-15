@@ -1,18 +1,18 @@
 import { useAuth } from '@clerk/expo';
-import { Redirect } from 'expo-router';
-import { NativeTabs } from 'expo-router/unstable-native-tabs';
+import { MaterialIcons } from '@expo/vector-icons';
+import { Redirect, Tabs } from 'expo-router';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useProfile } from '@/lib/api';
 
 export default function AppLayout() {
-    const { isLoaded, isSignedIn } = useAuth()
-    const { data: profile, isPending, isError, refetch } = useProfile()
+    const { isLoaded, isSignedIn } = useAuth();
+    const { data: profile, isPending, isError, refetch } = useProfile();
 
-
-    if (!isLoaded) return null
-    if (!isSignedIn) return <Redirect href="/" />
-    if (isPending) return <Centered />
+    if (!isLoaded) return null;
+    if (!isSignedIn) return <Redirect href="/" />;
+    if (isPending) return <Centered />;
 
     if (isError) {
         return (
@@ -24,43 +24,82 @@ export default function AppLayout() {
                     onPress={() => refetch()}
                     className="mt-[16px] h-[44px] items-center justify-center rounded-full bg-black px-[26px] active:opacity-90"
                 >
-                    <Text className="text-[15px] font-semibold text-white"></Text>
+                    <Text className="text-[15px] font-semibold text-white">Retry</Text>
                 </Pressable>
             </Centered>
-        )
+        );
     }
 
     if (!profile?.onboardingCompletedAt) {
-        return <Redirect href={{ pathname: '/onboarding/[step]', params: { step: 'gender' } }} />
+        return <Redirect href={{ pathname: '/onboarding/[step]', params: { step: 'gender' } }} />;
     }
 
     return (
-        <NativeTabs
-            backgroundColor="#FEFDFD"
-            tintColor="#000000"
-            iconColor={{ default: '#9A9AA0', selected: '#000000' }}
-            labelStyle={{ default: { color: '#9A9AA0' }, selected: { color: '#000000' } }}
-            disableTransparentOnScrollEdge
+        <Tabs
+            screenOptions={{
+                headerShown: false,
+                lazy: false,
+                animation: 'none',
+                freezeOnBlur: false,
+            }}
+            tabBar={(props) => <CustomTabBar {...props} />}
         >
-            <NativeTabs.Trigger name='home'>
-                <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
-                <NativeTabs.Trigger.Icon
-                    sf={{ default: 'house', selected: 'house.fill' }}
-                    md={{ default: 'home', selected: 'home_filled' }}
-                />
-            </NativeTabs.Trigger>
+            <Tabs.Screen name="home" options={{ title: 'Home' }} />
+            <Tabs.Screen name="camera" options={{ title: 'Scan' }} />
+            <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
+        </Tabs>
+    );
+}
 
-            <NativeTabs.Trigger name='camera'>
-                <NativeTabs.Trigger.Label>Scan</NativeTabs.Trigger.Label>
-                <NativeTabs.Trigger.Icon sf="camera.fill" md="photo_camera" />
-            </NativeTabs.Trigger>
+const ICONS: Record<string, keyof typeof MaterialIcons.glyphMap> = {
+    home: 'home',
+    camera: 'photo-camera',
+    profile: 'person',
+};
 
-            <NativeTabs.Trigger name='Profile'>
-                <NativeTabs.Trigger.Label>Profile</NativeTabs.Trigger.Label>
-                <NativeTabs.Trigger.Icon sf={{ default: 'person', selected: 'person.fill' }} md="person" />
-            </NativeTabs.Trigger>
-        </NativeTabs>
-    )
+function CustomTabBar({ state, navigation }: any) {
+    const insets = useSafeAreaInsets();
+
+    return (
+        <View
+            style={{ bottom: insets.bottom + 12 }}
+            className="absolute left-[40px] right-[40px] flex-row items-center justify-between rounded-[50px] bg-white px-[15px] py-[5px] shadow-lg"
+        >
+            {state.routes.map((route: any, index: number) => {
+                const focused = state.index === index;
+                const label = route.name.charAt(0).toUpperCase() + route.name.slice(1);
+
+                const onPress = () => {
+                    if (focused) return;
+                    navigation.navigate(route.name);
+                    navigation.emit({ type: 'tabPress', target: route.key });
+                };
+
+                return (
+                    <Pressable
+                        key={route.key}
+                        onPress={onPress}
+                        className={`flex-1 items-center justify-center rounded-[50px] py-[10px] ${
+                            focused ? 'bg-[#c0c0c0]' : ''
+                        }`}
+                    >
+                        <MaterialIcons
+                            name={ICONS[route.name]}
+                            size={25}
+                            color={focused ? '#FFFFFF' : '#9A9AA0'}
+                        />
+                        <Text
+                            className={`mt-[2px] text-[10px] ${
+                                focused ? 'font-semibold text-white' : 'text-[#9A9AA0]'
+                            }`}
+                        >
+                            {label}
+                        </Text>
+                    </Pressable>
+                );
+            })}
+        </View>
+    );
 }
 
 function Centered({ children }: { children?: React.ReactNode }) {
@@ -68,5 +107,5 @@ function Centered({ children }: { children?: React.ReactNode }) {
         <View className="flex-1 items-center justify-center bg-[#FEFDFD] px-[40px]">
             {children ?? <ActivityIndicator color="#000000" />}
         </View>
-    )
+    );
 }

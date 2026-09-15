@@ -5,6 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+
 export default function WelcomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -48,7 +49,18 @@ export default function WelcomeScreen() {
           className="mt-[17px] h-[48px] w-full flex-row items-center justify-center rounded-full bg-black active:opacity-90"
         >
           <Text className="text-[16px] font-bold tracking-[-0.4px] text-white">Get Started</Text>
-          <Text className="absolute right-[22px] text-[24px] text-white">→</Text>
+          <Text
+            className="absolute text-white"
+            style={{
+              right: 20,
+              top: "40%",
+              fontSize: 30,
+              lineHeight: 26,
+              transform: [{ translateY: -13 }],
+            }}
+          >
+            →
+          </Text>
         </Pressable>
 
         <Pressable onPress={() => router.push("/sign-in")} hitSlop={12}>

@@ -1,7 +1,8 @@
+import { Ionicons } from '@react-native-vector-icons/ionicons/static';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SymbolView, type SFSymbol } from 'expo-symbols';
-import type { ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -39,7 +40,7 @@ export function OnboardingScreen({
 
             <View className="mt-[4px] h-[24px] flex-row items-center px-[26px]">
                 <Pressable onPress={() => router.back()} hitSlop={12}>
-                    <SymbolView name="arrow.left" size={22} weight="medium" tintColor="#000000" />
+                    <Ionicons name="arrow-back" size={22} color="#000000" />
                 </Pressable>
                 <View className="ml-[26px] flex-row gap-[10px]">
                     {Array.from({ length: SEGMENTS }, (_, i) => (
@@ -51,24 +52,23 @@ export function OnboardingScreen({
                 </View>
             </View>
 
-            {title ? (
-                <Text className="ml-[26px] mt-[26px] w-[290px] text-[32px] font-bold leading-[38px] text-black">
-                    {title}
-                </Text>
-            ) : null}
-            {subtitle ? (
-                <Text className="ml-[26px] mt-[6px] w-[264px] text-[17px] leading-[23px] text-[#4A4A52]">
-                    {subtitle}
-                </Text>
-            ) : null}
-            {header}
-
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 bounces={false}
                 contentContainerStyle={{ flexGrow: 1, paddingBottom: 18 }}
                 className="flex-1"
             >
+                {title ? (
+                    <Text className="ml-[26px] mt-[26px] w-[290px] text-[32px] font-bold leading-[38px] text-black">
+                        {title}
+                    </Text>
+                ) : null}
+                {subtitle ? (
+                    <Text className="ml-[26px] mt-[6px] w-[264px] text-[17px] leading-[23px] text-[#4A4A52]">
+                        {subtitle}
+                    </Text>
+                ) : null}
+                {header}
                 {children}
             </ScrollView>
 
@@ -88,6 +88,7 @@ export function OptionCard({
     subtitle,
     icon,
     glyph,
+    vectorIcon,
     selected,
     tall,
     onPress,
@@ -96,6 +97,10 @@ export function OptionCard({
     subtitle?: string;
     icon?: SFSymbol;
     glyph?: string;
+    /** Monochrome, cross-platform icon (Ionicons name) — use this instead of `glyph`
+     *  (colored emoji) or `icon` (iOS-only SF Symbol) when you want a black icon that
+     *  also renders on Android. */
+    vectorIcon?: ComponentProps<typeof Ionicons>['name'];
     selected: boolean;
     tall?: boolean;
     onPress: () => void;
@@ -109,7 +114,9 @@ export function OptionCard({
             }}
         >
             <View className={`items-center justify-center ${tall ? 'h-[52px] w-[52px]' : 'h-[42px] w-[42px]'}`}>
-                {glyph ? (
+                {vectorIcon ? (
+                    <Ionicons name={vectorIcon} size={tall ? 28 : 24} color="#000000" />
+                ) : glyph ? (
                     <Text style={{ fontSize: 24, lineHeight: 28, includeFontPadding: false }}>
                         {glyph}
                     </Text>
@@ -127,7 +134,7 @@ export function OptionCard({
                 className={`h-[22px] w-[22px] items-center justify-center rounded-full ${selected ? 'bg-black' : 'border border-[#C8C8CC] bg-white'}`}
             >
                 {selected ? (
-                    <SymbolView name="checkmark" size={11} weight="bold" tintColor="#FFFFFF" />
+                    <Ionicons name="checkmark" size={11} color="#FFFFFF" />
                 ) : null}
             </View>
         </Pressable>

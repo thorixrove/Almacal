@@ -45,7 +45,8 @@
           "project": "almacal",
           "organization": "alamanatra"
         }
-      ]
+      ],
+      "@react-native-vector-icons/ionicons"
     ],
     "experiments": {
       "typedRoutes": true,

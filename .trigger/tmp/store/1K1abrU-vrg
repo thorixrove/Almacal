@@ -60,7 +60,7 @@ import {
   traceContext,
   usage,
   waitUntil
-} from "../../../../../../../../../../chunk-W4CT4RZG.mjs";
+} from "../../../../../../../../../../chunk-UUQUPK26.mjs";
 import "../../../../../../../../../../chunk-ZQK7JG23.mjs";
 import {
   context,
@@ -400,7 +400,7 @@ import { setTimeout as setTimeout2 } from "node:timers/promises";
 
 // ../../../AppData/Local/npm-cache/_npx/f51a09bd0abf5f10/node_modules/trigger.dev/dist/esm/version.js
 init_esm();
-var VERSION = "4.6.0";
+var VERSION = "4.6.1";
 
 // ../../../AppData/Local/npm-cache/_npx/f51a09bd0abf5f10/node_modules/trigger.dev/dist/esm/entryPoints/dev-run-worker.js
 import_source_map_support.default.install({

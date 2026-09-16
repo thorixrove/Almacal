@@ -47114,7 +47114,7 @@ var nanoid3 = /* @__PURE__ */ __name((size = 21) => {
 
 // ../../../AppData/Local/npm-cache/_npx/f51a09bd0abf5f10/node_modules/@trigger.dev/core/dist/esm/version.js
 init_esm();
-var VERSION = "4.6.0";
+var VERSION = "4.6.1";
 
 // ../../../AppData/Local/npm-cache/_npx/f51a09bd0abf5f10/node_modules/@trigger.dev/core/dist/esm/v3/apiKeys.js
 init_esm();
@@ -47405,10 +47405,15 @@ var CreateBackgroundWorkerRequestBody = external_exports.object({
   buildPlatform: external_exports.string().optional(),
   targetPlatform: external_exports.string().optional()
 });
+var BackgroundWorkerWarning = external_exports.object({
+  code: external_exports.enum(["schedule_default_window", "schedule_minimum_window"]),
+  message: external_exports.string()
+});
 var CreateBackgroundWorkerResponse = external_exports.object({
   id: external_exports.string(),
   version: external_exports.string(),
-  contentHash: external_exports.string()
+  contentHash: external_exports.string(),
+  warnings: external_exports.array(BackgroundWorkerWarning).optional()
 });
 var RunTag = external_exports.string().max(128, "Tags must be less than 128 characters");
 var RunTags = external_exports.union([RunTag, RunTag.array()]);
@@ -71834,4 +71839,4 @@ export {
    * limitations under the License.
    *)
 */
-//# sourceMappingURL=chunk-W4CT4RZG.mjs.map
+//# sourceMappingURL=chunk-UUQUPK26.mjs.map

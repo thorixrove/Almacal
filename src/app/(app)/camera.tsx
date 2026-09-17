@@ -1,3 +1,4 @@
+import { Ionicons } from '@react-native-vector-icons/ionicons/static';
 import * as Sentry from '@sentry/react-native';
 import { useRealtimeRun } from '@trigger.dev/react-hooks';
 import { CameraView, useCameraPermissions } from 'expo-camera';
@@ -5,14 +6,20 @@ import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { useIsFocused, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { SymbolView } from 'expo-symbols';
-import React, { use, useEffect, useRef, useState } from 'react';
+import React, { use, useEffect, useRef, useState, type ComponentProps } from 'react';
 import { ActivityIndicator, Linking, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { MACROS } from '@/constants/macros';
 import { useLogMeal, type LoggedMeal } from '@/lib/api';
 import type { analyzeMeal } from '@/trigger/analyze-meal';
+
+// SFSymbol names from MACROS are iOS-only; map by key to a cross-platform Ionicons name.
+const MACRO_VECTOR_ICON: Record<"protein" | "carbs" | "fat", ComponentProps<typeof Ionicons>["name"]> = {
+  protein: "water",
+  carbs: "leaf",
+  fat: "flame",
+};
 
 type Shot = { uri: string; base64: string };
 
@@ -51,7 +58,7 @@ export default function camera() {
       onPress={pickFromGallery}
       className="h-[52px] w-[52px] items-center justify-center rounded-full bg-[#1E1E23] active:opacity-70"
     >
-      <SymbolView name="photo.on.rectangle" size={22} tintColor="#FFFFFF" />
+      <Ionicons name="images" size={22} color="#FFFFFF" />
     </Pressable>
   )
 
@@ -63,7 +70,7 @@ export default function camera() {
       <Screen>
         <View className="flex-1 items-center justify-center px-[40px]">
           <View className="h-[76px] w-[76px] items-center justify-center rounded-full bg-[#1E1E23]">
-            <SymbolView name="camera.fill" size={32} tintColor="#FFFFFF"/>
+            <Ionicons name="camera" size={32} color="#FFFFFF" />
           </View>
           <Text className="mt-[22px] text-center text-[22px] font-bold text-white">
             Camera access
@@ -122,7 +129,7 @@ export default function camera() {
               disabled={logMeal.isPending}
               className="h-[56px] w-[56px] items-center justify-center rounded-full bg-[#1E1E23] active:opacity-70"
             >
-              <SymbolView name="arrow.counterclockwise" size={22} tintColor="#FFFFFF" />
+              <Ionicons name="refresh" size={22} color="#FFFFFF" />
             </Pressable>
             <Pressable
               onPress={() => logMeal.mutate(shot.base64)}
@@ -133,7 +140,7 @@ export default function camera() {
                 <ActivityIndicator color="#000000" />
               ) : (
                 <>
-                  <SymbolView name="sparkles" size={18} tintColor="#000000" />
+                  <Ionicons name="sparkles" size={18} color="#000000" />
                   <Text className="ml-[8px] text-[17px] font-semibold text-black">
                     Analyze the food
                   </Text>
@@ -208,7 +215,7 @@ export default function camera() {
 
 
     return (
-      <View className="flex-1" style={{ paddingTop: insets.top + 16, paddingBottom: insets.bottom }}>
+      <View className="flex-1" style={{ paddingTop: insets.top + 16, paddingBottom: insets.bottom + 100 }}>
         <Image
           source={{ uri }}
           style={{ height: 250, marginHorizontal: 22, borderRadius: 24 }}
@@ -238,7 +245,7 @@ export default function camera() {
                     key={macro.key}
                     className="flex-1 items-center rounded-[18px] bg-[#1E1E23] py-[14px]"
                   >
-                    <SymbolView name={macro.icon} size={18} tintColor={macro.color} />
+                    <Ionicons name={MACRO_VECTOR_ICON[macro.key]} size={18} color={macro.color} />
                     <Text className="mt-[8px] text-[19px] font-bold text-white">
                       {macro.key === 'protein'
                         ? output.proteinG

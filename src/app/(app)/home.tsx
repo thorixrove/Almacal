@@ -1,8 +1,8 @@
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { SymbolView } from "expo-symbols";
-import { useRef, useState } from "react";
+import { useRef, useState, type ComponentProps } from "react";
 import {
   ActivityIndicator,
   Platform,
@@ -24,6 +24,13 @@ const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const THUMB = 62;
 
 const TAB_BAR = Platform.select({ ios: 49, default: 80 });
+
+// SFSymbol names from MACROS are iOS-only; map by key to a cross-platform Ionicons name instead.
+const MACRO_VECTOR_ICON: Record<"protein" | "carbs" | "fat", ComponentProps<typeof Ionicons>["name"]> = {
+  protein: "water",
+  carbs: "leaf",
+  fat: "flame",
+};
 
 const thumbnail = (url: string, pt: number) => `${url}?tr=w-${pt * 3},h-${pt * 3},q-70`;
 
@@ -115,7 +122,7 @@ export default function home() {
             onPress={() => setShowStreak(true)}
             className="flex-row items-center rounded-full border border-[#EDEDEF] bg-white px-[14px] py-[7px] active:opacity-70"
           >
-            <SymbolView name="flame.fill" size={16} tintColor="#F4685C" />
+            <Ionicons name="flame" size={16} color="#F4685C" />
             <Text className="ml-[6px] text-[15px] font-bold text-black">{streak}</Text>
           </Pressable>
         </View>
@@ -187,7 +194,7 @@ export default function home() {
             </Text>
           </View>
           <Ring size={96} stroke={10} progress={eaten.calories / plan.calories}>
-            <SymbolView name="flame.fill" size={30} tintColor="#000000" />
+            <Ionicons name="flame" size={30} color="#000000" />
           </Ring>
         </View>
 
@@ -203,7 +210,7 @@ export default function home() {
                 <Text className="text-[22px] font-bold leading-[27px] tracking-[-0.4px] text-black">
                   {left}g
                 </Text>
-                <Text className="mt-[1px] text-[13px] leading-[18px] text-[#6E6E78]">
+                <Text className="mt-[1px] text-[11px] leading-[18px] text-[#6E6E78]">
                   {macro.label} left
                 </Text>
                 <View className="mt-[14px] w-full items-center">
@@ -213,7 +220,7 @@ export default function home() {
                     progress={eaten[macro.key] / target}
                     color={macro.color}
                   >
-                    <SymbolView name={macro.icon} size={20} tintColor={macro.color} />
+                    <Ionicons name={MACRO_VECTOR_ICON[macro.key]} size={20} color={macro.color} />
                   </Ring>
                 </View>
               </View>
@@ -284,10 +291,10 @@ export default function home() {
                 ) : meal.status === "analyzing" ? (
                   <ActivityIndicator className="ml-[10px] mr-[6px]" color="#8A8A90" />
                 ) : (
-                  <SymbolView
-                    name="exclamationmark.triangle.fill"
+                  <Ionicons
+                    name="warning"
                     size={18}
-                    tintColor="#D8D8DE"
+                    color="#D8D8DE"
                     style={{ marginLeft: 10, marginRight: 6 }}
                   />
                 )}
@@ -295,22 +302,25 @@ export default function home() {
             ))}
           </View>
         ) : (
-          <View className="mx-[22px] mt-[12px] items-center rounded-[20px] bg-[#F3F3F7] px-[18px] py-[22px]">
-            <View className="w-full flex-row items-center rounded-[16px] bg-white p-[12px]">
-              <View className="h-[46px] w-[46px] items-center justify-center rounded-[12px] bg-[#F3F3F7]">
-                <SymbolView name="fork.knife" size={22} tintColor="#B4B4BC" />
-              </View>
-              <View className="ml-[12px] flex-1 gap-[7px]">
-                <View className="h-[9px] w-full rounded-full bg-[#ECECEF]" />
-                <View className="h-[9px] w-[60%] rounded-full bg-[#ECECEF]" />
-              </View>
+          <View className="mx-[22px] mt-[12px] items-center rounded-[20px] bg-[#F3F3F7] px-[18px] py-[24px]">
+            <View className="h-[46px] w-[46px] items-center justify-center rounded-full bg-white">
+              <Ionicons name="restaurant" size={20} color="#B4B4BC" />
             </View>
-            <Text className="mt-[16px] text-center text-[15px] leading-[20px] text-[#6E6E78]">
+            <Text className="mt-[14px] text-center text-[15px] leading-[20px] text-[#6E6E78]">
               {isToday
                 ? "Snap your first meal of the day and the numbers land here."
                 : "No meals logged on this day."
               }
             </Text>
+            {isToday ? (
+              <Pressable
+                onPress={() => router.push("/camera")}
+                className="mt-[16px] h-[44px] flex-row items-center justify-center rounded-full bg-black px-[22px] active:opacity-90"
+              >
+                <Ionicons name="camera" size={16} color="#FFFFFF" />
+                <Text className="ml-[8px] text-[15px] font-semibold text-white">Scan a meal</Text>
+              </Pressable>
+            ) : null}
           </View>
         )}
       </ScrollView>

@@ -22,7 +22,7 @@ export default function WelcomeScreen() {
 
       <View className="mt-[22px] flex-row items-center justify-center gap-[10px]">
         <Image
-          source={require("@/assets/images/logo-mark.png")}
+          source={require("@/assets/images/almacal.png")}
           style={{ width: 41, height: 47, marginBottom: 8 }}
           contentFit="contain"
         />

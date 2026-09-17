@@ -63,7 +63,7 @@ export default function PlanReveal() {
           ))}
           <View className="h-[140px] w-[140px] items-center justify-center rounded-full bg-white shadow-sm">
             <Image
-              source={require('@/assets/images/logo-mark.png')}
+              source={require('@/assets/images/almacal.png')}
               style={{ width: 80, height: 92 }}
               contentFit="contain"
             />

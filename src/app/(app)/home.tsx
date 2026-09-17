@@ -110,8 +110,8 @@ export default function home() {
       >
         <View className="mt-[10px] flex-row items-center px-[22px]">
           <Image
-            source={require("@/assets/images/logo-mark.png")}
-            style={{ width: 26, height: 30 }}
+            source={require("@/assets/images/almacal.png")}
+            style={{ width: 30, height: 30 }}
             contentFit="contain"
           />
           <Text className="ml-[8px] text-[26px] font-bold tracking-[-0.6px] text-black">

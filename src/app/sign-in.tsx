@@ -77,7 +77,7 @@ export default function SignIn() {
 
       <View className="flex-1 items-center justify-center px-[26px]">
         <Image
-          source={require('@/assets/images/logo-mark.png')}
+          source={require('@/assets/images/almacal.png')}
           style={{ width: 62, height: 72 }}
           contentFit="contain"
         />

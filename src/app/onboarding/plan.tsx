@@ -1,12 +1,20 @@
+import { Ionicons } from '@react-native-vector-icons/ionicons/static';
 import { Image } from 'expo-image';
 import { Redirect, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { SymbolView } from 'expo-symbols';
+import { type ComponentProps } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { MACROS } from '@/constants/macros';
 import { draft } from '@/onboarding/steps';
+
+// SFSymbol names from MACROS are iOS-only; map by key to a cross-platform Ionicons name.
+const MACRO_VECTOR_ICON: Record<"protein" | "carbs" | "fat", ComponentProps<typeof Ionicons>["name"]> = {
+  protein: "water",
+  carbs: "leaf",
+  fat: "flame",
+};
 
 // left / top within the 260pt-tall hero, size, rotation, color
 const CONFETTI: [number, number, number, number, string][] = [
@@ -64,7 +72,7 @@ export default function PlanReveal() {
           <View className="h-[140px] w-[140px] items-center justify-center rounded-full bg-white shadow-sm">
             <Image
               source={require('@/assets/images/almacal.png')}
-              style={{ width: 80, height: 92 }}
+              style={{ width: 78, height: 90 }}
               contentFit="contain"
             />
           </View>
@@ -87,7 +95,7 @@ export default function PlanReveal() {
         <View className="mx-[26px] mt-[22px] flex-row rounded-[16px] border border-[#EDEDEF] bg-white py-[20px]">
           {MACROS.map((macro) => (
             <View key={macro.key} className="flex-1 items-center">
-              <SymbolView name={macro.icon} size={28} tintColor={macro.color} />
+              <Ionicons name={MACRO_VECTOR_ICON[macro.key]} size={28} color={macro.color} />
               <Text className="mt-[12px] text-[18px] font-bold leading-[23px] text-black">
                 {plan[macro.key]}g
               </Text>
@@ -101,7 +109,7 @@ export default function PlanReveal() {
         <View className="mx-[26px] mt-[12px] rounded-[16px] bg-[#EFEDFB] p-[16px]">
           <View className="flex-row items-center">
             <View className="h-[22px] w-[22px] items-center justify-center rounded-full bg-[#DAD4F7]">
-              <SymbolView name="star.fill" size={11} tintColor="#4A3FA8" />
+              <Ionicons name="star" size={11} color="#4A3FA8" />
             </View>
             <Text className="ml-[10px] text-[15px] font-bold leading-[20px] text-black">
               How we got here

@@ -2,6 +2,7 @@ import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useColorScheme } from "nativewind";
 import { useRef, useState, type ComponentProps } from "react";
 import {
   ActivityIndicator,
@@ -19,6 +20,7 @@ import { MealDetailSheet } from "@/components/meal-detail-sheet";
 import { StreakSheet } from "@/components/streak-sheet";
 import { MACROS } from "@/constants/macros";
 import { useDeleteMeal, useMeals, useProfile } from "@/lib/api";
+import { useThemeColors } from "@/lib/theme";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -49,6 +51,8 @@ const isoDate = (d: Date) =>
 export default function home() {
   const insets = useSafeAreaInsets()
   const router = useRouter()
+  const { colorScheme } = useColorScheme()
+  const theme = useThemeColors()
 
   const today = midnight(new Date())
   const [selected, setSelected] = useState(today)
@@ -106,8 +110,8 @@ export default function home() {
   const selectedMeal = meals.find((m) => m.id === selectedMealId) ?? null
 
   return (
-    <View collapsable={false} className="flex-1 bg-[#FEFDFD]" style={{ paddingTop: insets.top }}>
-      <StatusBar style="dark" />
+    <View collapsable={false} className="flex-1 bg-[#FEFDFD] dark:bg-[#0B0B0C]" style={{ paddingTop: insets.top }}>
+      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -119,16 +123,16 @@ export default function home() {
             style={{ width: 30, height: 30 }}
             contentFit="contain"
           />
-          <Text className="ml-[8px] text-[26px] font-bold tracking-[-0.6px] text-black">
+          <Text className="ml-[8px] text-[26px] font-bold tracking-[-0.6px] text-black dark:text-white">
             Almacal
           </Text>
           <View className="flex-1" />
           <Pressable
             onPress={() => setShowStreak(true)}
-            className="flex-row items-center rounded-full border border-[#EDEDEF] bg-white px-[14px] py-[7px] active:opacity-70"
+            className="flex-row items-center rounded-full border border-[#EDEDEF] bg-white px-[14px] py-[7px] active:opacity-70 dark:border-[#2C2C2E] dark:bg-[#1C1C1E]"
           >
             <Ionicons name="flame" size={16} color="#F4685C" />
-            <Text className="ml-[6px] text-[15px] font-bold text-black">{streak}</Text>
+            <Text className="ml-[6px] text-[15px] font-bold text-black dark:text-white">{streak}</Text>
           </Pressable>
         </View>
 
@@ -158,13 +162,25 @@ export default function home() {
                   className="w-[46px] items-center rounded-[16px] py-[7px]"
                   style={
                     isSelected
-                      ? { backgroundColor: "#FFFFFF", borderWidth: 1, borderColor: "#EDEDEF" }
+                      ? {
+                        backgroundColor: colorScheme === "dark" ? "#1C1C1E" : "#FFFFFF",
+                        borderWidth: 1,
+                        borderColor: colorScheme === "dark" ? "#2C2C2E" : "#EDEDEF",
+                      }
                       : undefined
                   }
                 >
                   <Text
                     className="text-[13px] font-medium"
-                    style={{ color: isFuture ? "#C8C8CC" : isSelected ? "#000000" : "#8A8A90" }}
+                    style={{
+                      color: isFuture
+                        ? "#C8C8CC"
+                        : isSelected
+                          ? theme.text
+                          : colorScheme === "dark"
+                            ? "#9A9AA0"
+                            : "#8A8A90",
+                    }}
                   >
                     {WEEKDAYS[d.getDay()]}
                   </Text>
@@ -173,12 +189,16 @@ export default function home() {
                     style={{
                       borderWidth: 1.5,
                       borderStyle: isSelected || isFuture ? "solid" : "dashed",
-                      borderColor: isFuture ? "#EDEDEF" : isSelected ? "#000000" : "#D3D3D8",
+                      borderColor: isFuture
+                        ? (colorScheme === "dark" ? "#2C2C2E" : "#EDEDEF")
+                        : isSelected
+                          ? theme.text
+                          : "#D3D3D8",
                     }}
                   >
                     <Text
                       className="text-[16px] font-semibold"
-                      style={{ color: isFuture ? "#C8C8CC" : "#000000" }}
+                      style={{ color: isFuture ? "#C8C8CC" : theme.text }}
                     >
                       {d.getDate()}
                     </Text>
@@ -189,17 +209,17 @@ export default function home() {
           })}
         </ScrollView>
 
-        <View className="mx-[22px] mt-[20px] flex-row items-center rounded-[22px] border border-[#EDEDEF] bg-white px-[22px] py-[22px]">
+        <View className="mx-[22px] mt-[20px] flex-row items-center rounded-[22px] border border-[#EDEDEF] bg-white px-[22px] py-[22px] dark:border-[#2C2C2E] dark:bg-[#1C1C1E]">
           <View className="flex-1">
-            <Text className="text-[46px] font-bold leading-[52px] tracking-[-1px] text-black">
+            <Text className="text-[46px] font-bold leading-[52px] tracking-[-1px] text-black dark:text-white">
               {Math.max(0, plan.calories - eaten.calories).toLocaleString("en-US")}
             </Text>
-            <Text className="mt-[2px] text-[16px] leading-[21px] text-[#6E6E78]">
+            <Text className="mt-[2px] text-[16px] leading-[21px] text-[#6E6E78] dark:text-[#9A9AA0]">
               Calories left
             </Text>
           </View>
           <Ring size={96} stroke={10} progress={eaten.calories / plan.calories}>
-            <Ionicons name="flame" size={30} color="#000000" />
+            <Ionicons name="flame" size={30} color={theme.icon} />
           </Ring>
         </View>
 
@@ -210,12 +230,12 @@ export default function home() {
             return (
               <View
                 key={macro.key}
-                className="flex-1 items-start rounded-[20px] border border-[#EDEDEF] bg-white px-[16px] py-[16px]"
+                className="flex-1 items-start rounded-[20px] border border-[#EDEDEF] bg-white px-[16px] py-[16px] dark:border-[#2C2C2E] dark:bg-[#1C1C1E]"
               >
-                <Text className="text-[22px] font-bold leading-[27px] tracking-[-0.4px] text-black">
+                <Text className="text-[22px] font-bold leading-[27px] tracking-[-0.4px] text-black dark:text-white">
                   {left}g
                 </Text>
-                <Text className="mt-[1px] text-[11px] leading-[18px] text-[#6E6E78]">
+                <Text className="mt-[1px] text-[11px] leading-[18px] text-[#6E6E78] dark:text-[#9A9AA0]">
                   {macro.label} left
                 </Text>
                 <View className="mt-[14px] w-full items-center">
@@ -233,7 +253,7 @@ export default function home() {
           })}
         </View>
 
-        <Text className="ml-[22px] mt-[28px] text-[22px] font-bold tracking-[-0.4px] text-black">
+        <Text className="ml-[22px] mt-[28px] text-[22px] font-bold tracking-[-0.4px] text-black dark:text-white">
           {isToday
             ? "Today's meals"
             : selectedDate.toLocaleDateString("en-US", {
@@ -249,7 +269,7 @@ export default function home() {
               <Pressable
                 key={meal.id}
                 onPress={() => setSelectedMealId(meal.id)}
-                className="flex-row items-center rounded-[18px] border border-[#EDEDEF] bg-white p-[10px] active:opacity-70"
+                className="flex-row items-center rounded-[18px] border border-[#EDEDEF] bg-white p-[10px] active:opacity-70 dark:border-[#2C2C2E] dark:bg-[#1C1C1E]"
               >
                 <Image
                   source={{ uri: thumbnail(meal.imageUrl, THUMB) }}
@@ -258,7 +278,7 @@ export default function home() {
                   transition={200}
                 />
                 <View className="ml-[14px] flex-1">
-                  <Text numberOfLines={1} className="text-[16px] font-semibold text-black">
+                  <Text numberOfLines={1} className="text-[16px] font-semibold text-black dark:text-white">
                     {meal.status === "completed"
                       ? meal.name
                       : meal.status === "analyzing"
@@ -267,7 +287,7 @@ export default function home() {
                           ? "Not food"
                           : "Couldn't read this one"}
                   </Text>
-                  <Text className="mt-[2px] text-[13px] text-[#8A8A90]">
+                  <Text className="mt-[2px] text-[13px] text-[#8A8A90] dark:text-[#9A9AA0]">
                     {meal.loggedAt.toLocaleTimeString("en-US", {
                       hour: "numeric",
                       minute: "2-digit",
@@ -282,7 +302,7 @@ export default function home() {
                             className="h-[7px] w-[7px] rounded-full"
                             style={{ backgroundColor: macro.color }}
                           />
-                          <Text className="ml-[4px] text-[12px] text-[#6E6E78]">
+                          <Text className="ml-[4px] text-[12px] text-[#6E6E78] dark:text-[#9A9AA0]">
                             {meal[macro.key]}g
                           </Text>
                         </View>
@@ -291,11 +311,11 @@ export default function home() {
                   ) : null}
                 </View>
                 {meal.status === "completed" ? (
-                  <Text className="ml-[10px] mr-[6px] text-[16px] font-bold text-black">
+                  <Text className="ml-[10px] mr-[6px] text-[16px] font-bold text-black dark:text-white">
                     {meal.calories}
                   </Text>
                 ) : meal.status === "analyzing" ? (
-                  <ActivityIndicator className="ml-[10px] mr-[6px]" color="#8A8A90" />
+                  <ActivityIndicator className="ml-[10px] mr-[6px]" color={colorScheme === "dark" ? "#9A9AA0" : "#8A8A90"} />
                 ) : (
                   <Ionicons
                     name="warning"
@@ -308,11 +328,11 @@ export default function home() {
             ))}
           </View>
         ) : (
-          <View className="mx-[22px] mt-[12px] items-center rounded-[20px] bg-[#F3F3F7] px-[18px] py-[24px]">
-            <View className="h-[46px] w-[46px] items-center justify-center rounded-full bg-white">
+          <View className="mx-[22px] mt-[12px] items-center rounded-[20px] bg-[#F3F3F7] px-[18px] py-[24px] dark:bg-[#1C1C1E]">
+            <View className="h-[46px] w-[46px] items-center justify-center rounded-full bg-white dark:bg-[#2C2C2E]">
               <Ionicons name="restaurant" size={20} color="#B4B4BC" />
             </View>
-            <Text className="mt-[14px] text-center text-[15px] leading-[20px] text-[#6E6E78]">
+            <Text className="mt-[14px] text-center text-[15px] leading-[20px] text-[#6E6E78] dark:text-[#9A9AA0]">
               {isToday
                 ? "Snap your first meal of the day and the numbers land here."
                 : "No meals logged on this day."

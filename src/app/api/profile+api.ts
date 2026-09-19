@@ -18,6 +18,7 @@ const PROFILE_COLUMNS = {
   activityLevel: users.activityLevel,
   paceKgPerWeek: users.paceKgPerWeek,
   dietPreference: users.dietPreference,
+  unitPreference: users.unitPreference,
   timezone: users.timezone,
   dailyCalories: users.dailyCalories,
   proteinG: users.proteinG,
@@ -41,28 +42,21 @@ const saveProfileSchema = planInputSchema.extend({
 });
 
 
-const updateProfileSchema = planInputSchema.partial()
+const updateProfileSchema = planInputSchema.partial().extend({
+  unitPreference: z.enum(["metric", "imperial"]).optional(),
+});
 
 /** Profile + targets, or `null` for a user who hasn't finished onboarding. */
 export async function GET(request: Request) {
   const clerkUserId = await getAuthUserId(request);
   if (!clerkUserId) return unauthorized();
 
-  try {
-    const [profile] = await db
-      .select(PROFILE_COLUMNS)
-      .from(users)
-      .where(eq(users.clerkUserId, clerkUserId));
+  const [profile] = await db
+    .select(PROFILE_COLUMNS)
+    .from(users)
+    .where(eq(users.clerkUserId, clerkUserId));
 
-    return Response.json(profile ?? null);
-  } catch (error) {
-    // TEMP DEBUG — hapus lagi setelah ketemu penyebabnya
-    console.log('GET /api/profile failed', {
-      message: error instanceof Error ? error.message : String(error),
-      cause: error instanceof Error ? error.cause : undefined,
-    });
-    throw error;
-  }
+  return Response.json(profile ?? null);
 }
 
 /**

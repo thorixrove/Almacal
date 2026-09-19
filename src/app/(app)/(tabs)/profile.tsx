@@ -6,12 +6,14 @@ import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { openBrowserAsync } from 'expo-web-browser';
+import { useColorScheme } from 'nativewind';
 import { type ComponentProps, type ReactNode } from 'react';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomTabInset } from '@/constants/theme';
 import { deleteAccount } from '@/lib/api';
+import { useThemeColors } from '@/lib/theme';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -24,7 +26,7 @@ const soon = () => Alert.alert('Coming soon')
 
 function SectionTitle({ children }: { children: ReactNode }) {
   return (
-    <Text className="ml-[26px] mb-[8px] mt-[26px] text-[15px] font-medium text-[#8A8A90]">
+    <Text className="ml-[26px] mb-[8px] mt-[26px] text-[15px] font-medium text-[#8A8A90] dark:text-[#9A9AA0]">
       {children}
     </Text>
   )
@@ -32,7 +34,7 @@ function SectionTitle({ children }: { children: ReactNode }) {
 
 
 function Card({ children }: { children: ReactNode }) {
-  return <View className="mx-[18px] overflow-hidden rounded-[20px] bg-white">{children}</View>
+  return <View className="mx-[18px] overflow-hidden rounded-[20px] bg-white dark:bg-[#1C1C1E]">{children}</View>
 }
 
 
@@ -41,7 +43,7 @@ function Row({
   label,
   value,
   onPress,
-  tint = '#000000',
+  tint,
   divider,
 }: {
   icon: IconName
@@ -51,18 +53,21 @@ function Row({
   tint?: string
   divider?: boolean
 }) {
+  const theme = useThemeColors()
+  const effectiveTint = tint ?? theme.icon
+
   const body = (
     <View className="flex-row items-center px-[18px] py-[15px]">
-      <Ionicons name={icon} size={21} color={tint} style={{ width: 24, height: 24 }} />
-      <Text className="ml-[12px] flex-1 text-[17px]" style={{ color: tint }} numberOfLines={1}>
+      <Ionicons name={icon} size={21} color={effectiveTint} style={{ width: 24, height: 24 }} />
+      <Text className="ml-[12px] flex-1 text-[17px]" style={{ color: effectiveTint }} numberOfLines={1}>
         {label}
       </Text>
-      {value ? <Text className="text-[16px] text-[#8A8A90]">{value}</Text> : null}
+      {value ? <Text className="text-[16px] text-[#8A8A90] dark:text-[#9A9AA0]">{value}</Text> : null}
       {onPress ? (
         <Ionicons
         name='chevron-forward'
         size={16}
-        color='#C2C2C9'
+        color={theme.chevron}
         style={{ width: 16, height: 16, marginLeft: 6}}
         />
       ) : null}
@@ -71,9 +76,9 @@ function Row({
 
 
   return (
-    <View style={divider ? { borderTopWidth: 1, borderTopColor: '#F1F1F3' } : undefined}>
+    <View className={divider ? 'border-t border-[#F1F1F3] dark:border-[#2C2C2E]' : undefined}>
       {onPress ? (
-        <Pressable onPress={onPress} className="active:bg-[#F7F7F9]">
+        <Pressable onPress={onPress} className="active:bg-[#F7F7F9] dark:active:bg-[#242426]">
           {body}
         </Pressable>
       ) : (
@@ -88,6 +93,8 @@ export default function profile() {
   const { signOut, getToken } = useAuth()
   const { user } = useUser()
   const queryClient = useQueryClient()
+  const theme = useThemeColors()
+  const { colorScheme: resolvedScheme } = useColorScheme()
 
   const memberSince = user?.createdAt
     ? user.createdAt.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
@@ -134,32 +141,32 @@ export default function profile() {
     )
 
   return (
-    <View collapsable={false} className="flex-1 bg-[#F4F4F6]" style={{ paddingTop: insets.top }}>
-      <StatusBar style="dark"/>
+    <View collapsable={false} className="flex-1 bg-[#F4F4F6] dark:bg-[#0B0B0C]" style={{ paddingTop: insets.top }}>
+      <StatusBar style={resolvedScheme === 'dark' ? 'light' : 'dark'}/>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + BottomTabInset + 28 }}>
-        <Text className="ml-[22px] mt-[10px] text-[34px] font-bold tracking-[-0.8px] text-black">
+        <Text className="ml-[22px] mt-[10px] text-[34px] font-bold tracking-[-0.8px] text-black dark:text-white">
           Profile
         </Text>
 
-        <View className="mx-[18px] mt-[18px] flex-row items-center rounded-[20px] bg-white p-[16px]">
+        <View className="mx-[18px] mt-[18px] flex-row items-center rounded-[20px] bg-white dark:bg-[#1C1C1E] p-[16px]">
           {user?.imageUrl ? (
             <Image
               source={{ uri: user.imageUrl }}
               style={{ width: 56, height: 56, borderRadius: 28 }}
             />
           ) : (
-            <View className="h-[56px] w-[56px] items-center justify-center rounded-full bg-[#F1F1F6]">
-              <Ionicons name="person" size={26} color="#B4B4BC" />
+            <View className="h-[56px] w-[56px] items-center justify-center rounded-full bg-[#F1F1F6] dark:bg-[#2C2C2E]">
+              <Ionicons name="person" size={26} color={theme.subtext} />
             </View>
           )}
           <View className="ml-[14px] flex-1">
-            <Text numberOfLines={1} className="text-[20px] font-bold text-black">
+            <Text numberOfLines={1} className="text-[20px] font-bold text-black dark:text-white">
               {user?.fullName ?? user?.firstName ?? 'Your Profile'}
             </Text>
-            <Text numberOfLines={1} className="mt-[2px] text-[15px] text-[#8A8A90]">
+            <Text numberOfLines={1} className="mt-[2px] text-[15px] text-[#8A8A90] dark:text-[#9A9AA0]">
               {user?.primaryEmailAddress?.emailAddress ?? 'Signed in'}
             </Text>
           </View>
@@ -175,7 +182,7 @@ export default function profile() {
             label="Personal Details"
             onPress={() => router.push('/personal-details')}
           />
-          <Row divider icon="settings" label="Preferences" onPress={soon} />
+          <Row divider icon="settings" label="Preferences" onPress={() => router.push('/preferences')} />
           <Row divider icon="globe" label="Language" onPress={soon} />
           <Row divider icon="people" label="Upgrade to Family Plan" onPress={soon} />
         </Card>
@@ -222,10 +229,10 @@ export default function profile() {
 
         <View className="mt-[10px]">
           <Card>
-            <Row icon="trash" label="Delete your account" tint="#E5484D" onPress={confirmDelete} />
+            <Row icon="trash" label="Delete your account" tint={theme.danger} onPress={confirmDelete} />
           </Card>
         </View>
-        <Text className="mt-[10px] px-[26px] text-[13px] leading-[18px] text-[#A0A0A8]">
+        <Text className="mt-[10px] px-[26px] text-[13px] leading-[18px] text-[#A0A0A8] dark:text-[#7A7A80]">
           Deleting your account removes your profile and meal history for good.
         </Text>
       </ScrollView>

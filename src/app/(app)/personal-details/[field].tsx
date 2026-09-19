@@ -1,14 +1,15 @@
 import { Ionicons } from '@react-native-vector-icons/ionicons/static';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useColorScheme } from 'nativewind';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { OptionCard, RulerPicker } from '@/components/onboarding';
 import { type Profile, useProfile, useUpdateProfile } from '@/lib/api';
+import { useThemeColors } from '@/lib/theme';
 import { stepIndex, steps } from '@/onboarding/steps';
-import { index } from 'drizzle-orm/gel-core';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const DAY_OPTIONS = Array.from({ length: 31 }, (_, i) => i + 1);
@@ -25,6 +26,9 @@ function BirthdayWheelPicker({
     value?: string
     onChange: (date: string) => void
 }) {
+    const { colorScheme: resolvedScheme } = useColorScheme()
+    const isDark = resolvedScheme === 'dark'
+
     const baseDate = value ? new Date(value) : new Date(FALLBACK_DOB)
     const initialDay = baseDate.getDate()
     const initialMonth = baseDate.getMonth()
@@ -73,7 +77,9 @@ function BirthdayWheelPicker({
                                 <Text
                                     style={{
                                         fontSize: isSelected ? 18 : 16,
-                                        color: isSelected ? '#111827' : '#9CA3AF',
+                                        color: isSelected
+                                            ? (isDark ? '#F5F5F6' : '#111827')
+                                            : (isDark ? '#6B6B70' : '#9CA3AF'),
                                         fontWeight: isSelected ? '600' : '400',
                                         opacity: isSelected ? 1 : 0.7,
                                     }}
@@ -95,8 +101,8 @@ function BirthdayWheelPicker({
                         height: itemHeight,
                         borderTopWidth: 1,
                         borderBottomWidth: 1,
-                        borderColor: '#E5E7EB',
-                        backgroundColor: 'rgba(255,255,255,0.2)',
+                        borderColor: isDark ? '#3A3A3C' : '#E5E7EB',
+                        backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.2)',
                     }}
                 />
             </View>
@@ -109,7 +115,7 @@ function BirthdayWheelPicker({
     const yearIndex = YEAR_OPTIONS.indexOf(year)
 
     return (
-        <View className="flex-row items-center justify-between rounded-[18px] bg-[#F5F5F6] px-[18px] py-[8px]">
+        <View className="flex-row items-center justify-between rounded-[18px] bg-[#F5F5F6] px-[18px] py-[8px] dark:bg-[#1C1C1E]">
             {renderColumn(DAY_OPTIONS, dayIndex, (index) => commit(DAY_OPTIONS[index], month, year))}
             {renderColumn(MONTHS, monthIndex, (index) => commit(day, index, year))}
             {renderColumn(YEAR_OPTIONS, yearIndex, (index) => commit(day, month, YEAR_OPTIONS[index]))}
@@ -123,6 +129,8 @@ export default function EditPersonalDetail() {
     const insets = useSafeAreaInsets()
     const { data: profile } = useProfile()
     const update = useUpdateProfile()
+    const theme = useThemeColors()
+    const { colorScheme: resolvedScheme } = useColorScheme()
 
 
     const index = stepIndex(key)
@@ -143,20 +151,20 @@ export default function EditPersonalDetail() {
     }
 
     return (
-        <View className="flex-1 bg-[#F4F4F6]" style={{ paddingTop: insets.top }}>
-            <StatusBar style="dark" />
+        <View className="flex-1 bg-[#F4F4F6] dark:bg-[#0B0B0C]" style={{ paddingTop: insets.top }}>
+            <StatusBar style={resolvedScheme === 'dark' ? 'light' : 'dark'} />
 
             <View className="h-[44px] flex-row items-center justify-between px-[18px]">
                 <Pressable onPress={() => router.back()} hitSlop={12}>
-                    <Ionicons name="close" size={24} color="#000000" />
+                    <Ionicons name="close" size={24} color={theme.icon} />
                 </Pressable>
                 <Pressable onPress={save} disabled={update.isPending || value === undefined} hitSlop={12}>
                     {update.isPending ? (
-                        <ActivityIndicator color="#000000" />
+                        <ActivityIndicator color={theme.icon} />
                     ) : (
                         <Text
                             className="text-[17px] font-semibold"
-                            style={{ color: value === undefined ? '#C2C2C9' : '#000000' }}
+                            style={{ color: value === undefined ? theme.chevron : theme.icon }}
                         >
                             Save
                         </Text>
@@ -165,13 +173,15 @@ export default function EditPersonalDetail() {
             </View>
 
 
-            <Text className="mx-[26px] mt-[10px] text-[26px] font-bold text-black">{step.title}</Text>
-            <Text className="mx-[26px] mt-[4px] text-[15px] leading-[20px] text-[#6E6E78]">
+            <Text className="mx-[26px] mt-[10px] text-[26px] font-bold text-black dark:text-white">
+                {step.title}
+            </Text>
+            <Text className="mx-[26px] mt-[4px] text-[15px] leading-[20px] text-[#6E6E78] dark:text-[#9A9AA0]">
                 {step.subtitle}
             </Text>
 
             {update.isError ? (
-                <Text className="mx-[26px] mt-[10px] text-[14px] text-[#C4453C]">
+                <Text className="mx-[26px] mt-[10px] text-[14px] text-[#C4453C] dark:text-[#FF6961]">
                     Couldn&apos;t save. Please try again.
                 </Text>
             ) : null}

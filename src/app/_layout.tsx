@@ -5,6 +5,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { isRunningInExpoGo } from "expo";
 import { Stack, useNavigationContainerRef } from "expo-router";
 import { useEffect, useState } from "react";
+import { LogBox } from "react-native";
+import { colorScheme } from "nativewind";
+
+import { loadThemePreference } from "@/lib/theme";
 
 import "@/global.css";
 
@@ -25,14 +29,21 @@ const navigationIntegration = Sentry.reactNavigationIntegration({
   enableTimeToInitialDisplay: !isRunningInExpoGo(),
 });
 
+// safety net: hide the two harmless native Sentry messages on Android
+LogBox.ignoreLogs([
+  "[Native] [Sentry] addListener of NativeEventEmitter",
+  "[Native] [Sentry] Failed to delete",
+]);
+
 Sentry.init({
   dsn: "https://f3be6c9687561e6cb48e1aad78153ba2@o4511578221182976.ingest.us.sentry.io/4512079896641536",
   // The SDK would default this to "development" on a dev build, which the dashboard's
   // environment filter hides unless you switch it. Explicit so it's visible in the UI.
   environment: __DEV__ ? "development" : "production",
-  // logs every envelope it sends to the Metro console — the only way to tell "the SDK
-  // never sent it" apart from "the dashboard is filtering it out"
-  debug: __DEV__,
+  // Off by default: on Android it forwards native SDK logs to the console as red
+  // "[Native] [Sentry] ..." errors that are harmless noise. Flip to __DEV__ only when you
+  // need to check whether an envelope was actually sent.
+  debug: false,
   sendDefaultPii: true,
   enableLogs: true,
   // ponytail: sample everything while the app is small; drop to ~0.1 once traffic costs quota
@@ -66,11 +77,21 @@ function RootLayout() {
   return (
     <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
       <QueryClientProvider client={queryClient}>
+        <ThemeGate />
         <SentryUser />
         <Stack screenOptions={{ headerShown: false }} />
       </QueryClientProvider>
     </ClerkProvider>
   );
+}
+
+
+function ThemeGate() {
+  useEffect(() => {
+    loadThemePreference().then((preference) => colorScheme.set(preference))
+  }, [])
+
+  return null
 }
 
 /**

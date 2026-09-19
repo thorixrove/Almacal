@@ -22,6 +22,7 @@ export type Profile = Pick<
   | 'activityLevel'
   | 'paceKgPerWeek'
   | 'dietPreference'
+  | 'unitPreference'
   | 'timezone'
   | 'dailyCalories'
   | 'proteinG'
@@ -144,7 +145,7 @@ export function useUpdateProfile() {
         body: JSON.stringify(changes),
       })
 
-      if (!response.ok) throw new Error('Could not update your profile (${response.status})')
+      if (!response.ok) throw new Error(`Could not update your profile (${response.status})`)
         return response.json()
     },
     onSuccess: (profile) => queryClient.setQueryData(PROFILE_KEY, profile),

@@ -169,7 +169,12 @@ export default function profile() {
         <SectionTitle>Account</SectionTitle>
         <Card>
           <Row icon='calendar' label="Member since" value={memberSince} />
-          <Row divider icon="card" label="Personal Details" onPress={soon} />
+          <Row
+            divider
+            icon="card"
+            label="Personal Details"
+            onPress={() => router.push('/personal-details')}
+          />
           <Row divider icon="settings" label="Preferences" onPress={soon} />
           <Row divider icon="globe" label="Language" onPress={soon} />
           <Row divider icon="people" label="Upgrade to Family Plan" onPress={soon} />

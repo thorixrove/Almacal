@@ -139,7 +139,7 @@ export function useUpdateProfile() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer ${await getToken()}',
+          Authorization: `Bearer ${await getToken()}`,
         },
         body: JSON.stringify(changes),
       })

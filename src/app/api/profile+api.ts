@@ -40,17 +40,29 @@ const saveProfileSchema = planInputSchema.extend({
   }),
 });
 
+
+const updateProfileSchema = planInputSchema.partial()
+
 /** Profile + targets, or `null` for a user who hasn't finished onboarding. */
 export async function GET(request: Request) {
   const clerkUserId = await getAuthUserId(request);
   if (!clerkUserId) return unauthorized();
 
-  const [profile] = await db
-    .select(PROFILE_COLUMNS)
-    .from(users)
-    .where(eq(users.clerkUserId, clerkUserId));
+  try {
+    const [profile] = await db
+      .select(PROFILE_COLUMNS)
+      .from(users)
+      .where(eq(users.clerkUserId, clerkUserId));
 
-  return Response.json(profile ?? null);
+    return Response.json(profile ?? null);
+  } catch (error) {
+    // TEMP DEBUG — hapus lagi setelah ketemu penyebabnya
+    console.log('GET /api/profile failed', {
+      message: error instanceof Error ? error.message : String(error),
+      cause: error instanceof Error ? error.cause : undefined,
+    });
+    throw error;
+  }
 }
 
 /**
@@ -115,6 +127,37 @@ export async function POST(request: Request) {
  * Nothing is swallowed. A half-finished delete answers 500 and the client retries;
  * each step is idempotent, so the retry finishes whatever is left.
  */
+
+
+export async function PATCH(request: Request) {
+  const clerkUserId = await getAuthUserId(request)
+  if (!clerkUserId) return unauthorized()
+
+    const parsed = updateProfileSchema.safeParse(await request.json().catch(() => null))
+    if (!parsed.success) {
+      return Response.json(
+        { error: "Invalid profile", issues: parsed.error.issues},
+        { status: 400 },
+      )
+    }
+
+    if (Object.keys(parsed.data).length === 0) {
+      return Response.json({ error: "No fields to update"}, { status: 400})
+    }
+
+    const [profile] = await  db
+    .update(users)
+    .set({ ...parsed.data, updatedAt: new Date() })
+    .where(eq(users.clerkUserId, clerkUserId))
+    .returning(PROFILE_COLUMNS)
+
+    if (!profile) {
+      return Response.json({ error: "Finish onboarding first"}, { status: 404})
+    }
+
+    return Response.json(profile)
+}
+
 export async function DELETE(request: Request) {
   const clerkUserId = await getAuthUserId(request);
   if (!clerkUserId) return unauthorized();

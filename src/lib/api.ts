@@ -127,6 +127,34 @@ export function useSaveProfile() {
   });
 }
 
+
+
+export function useUpdateProfile() {
+  const { getToken} = useAuth()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (changes: Partial<Profile>): Promise<Profile> => {
+      const response = await fetch('/api/profile', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ${await getToken()}',
+        },
+        body: JSON.stringify(changes),
+      })
+
+      if (!response.ok) throw new Error('Could not update your profile (${response.status})')
+        return response.json()
+    },
+    onSuccess: (profile) => queryClient.setQueryData(PROFILE_KEY, profile),
+    onError: (error) =>
+      Sentry.logger.error('Profile update failed', { reason: String(error)}),
+  })
+}
+
+
+
 /** Deletes the row, the meals and the Clerk user. Sign out and clear the cache after. */
 export async function deleteAccount(token: string | null) {
   const response = await fetch('/api/profile', {
@@ -173,6 +201,34 @@ export function useMeals(date: string) {
       query.state.data?.some((meal) => meal.status === 'analyzing') ? 3000 : false,
   });
 }
+
+
+export function useDeleteMeal() {
+  const { getToken} = useAuth()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (mealId: string): Promise<void> => {
+      const response = await fetch (`/api/meals?id=${mealId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${await getToken()}`},
+      })
+
+      // TEMP DEBUG — hapus lagi setelah ketemu penyebabnya
+      if (!response.ok) {
+        const body = await response.text().catch(() => '<no body>')
+        console.log('DELETE /api/meals failed', response.status, body)
+      }
+
+      if (!response.ok) throw new Error(`Could not delete this meal (${response.status})`)
+    },
+  onSuccess: () => queryClient.invalidateQueries({ queryKey: MEALS_KEY}),
+  onError: (error) =>
+    Sentry.logger.error('Meal delete failed', { reason: String(error)})
+  })
+}
+
+
 
 /** Photo (base64 JPEG) → an `analyzing` meal plus the Realtime credentials to watch it. */
 export function useLogMeal() {

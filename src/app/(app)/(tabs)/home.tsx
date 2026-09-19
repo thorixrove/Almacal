@@ -15,9 +15,10 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Ring } from "@/components/ring";
+import { MealDetailSheet } from "@/components/meal-detail-sheet";
 import { StreakSheet } from "@/components/streak-sheet";
 import { MACROS } from "@/constants/macros";
-import { useMeals, useProfile } from "@/lib/api";
+import { useDeleteMeal, useMeals, useProfile } from "@/lib/api";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -51,6 +52,8 @@ export default function home() {
 
   const today = midnight(new Date())
   const [selected, setSelected] = useState(today)
+  const [selectedMealId, setSelectedMealId] = useState<string | null>(null)
+  const deleteMeal = useDeleteMeal()
   const [showStreak, setShowStreak] = useState(false)
 
   const { width } = useWindowDimensions()
@@ -99,6 +102,8 @@ export default function home() {
         },
     { calories: 0, protein: 0, carbs: 0, fat: 0 },
   )
+
+  const selectedMeal = meals.find((m) => m.id === selectedMealId) ?? null
 
   return (
     <View collapsable={false} className="flex-1 bg-[#FEFDFD]" style={{ paddingTop: insets.top }}>
@@ -190,7 +195,7 @@ export default function home() {
               {Math.max(0, plan.calories - eaten.calories).toLocaleString("en-US")}
             </Text>
             <Text className="mt-[2px] text-[16px] leading-[21px] text-[#6E6E78]">
-              Clories left
+              Calories left
             </Text>
           </View>
           <Ring size={96} stroke={10} progress={eaten.calories / plan.calories}>
@@ -241,9 +246,10 @@ export default function home() {
         {meals.length ? (
           <View className="mt-[12px] gap-[10px] px-[22px]">
             {meals.map((meal) => (
-              <View
+              <Pressable
                 key={meal.id}
-                className="flex-row items-center rounded-[18px] border border-[#EDEDEF] bg-white p-[10px]"
+                onPress={() => setSelectedMealId(meal.id)}
+                className="flex-row items-center rounded-[18px] border border-[#EDEDEF] bg-white p-[10px] active:opacity-70"
               >
                 <Image
                   source={{ uri: thumbnail(meal.imageUrl, THUMB) }}
@@ -298,7 +304,7 @@ export default function home() {
                     style={{ marginLeft: 10, marginRight: 6 }}
                   />
                 )}
-              </View>
+              </Pressable>
             ))}
           </View>
         ) : (
@@ -325,6 +331,15 @@ export default function home() {
         )}
       </ScrollView>
       {showStreak ? <StreakSheet streak={streak} onClose={() => setShowStreak(false)} /> : null}
+      <MealDetailSheet
+      meal={selectedMeal}
+      onClose={() => setSelectedMealId(null)}
+      deleting={deleteMeal.isPending}
+      dailyTarget={plan}
+      onDelete={(id) =>
+        deleteMeal.mutate(id, { onSuccess: () => setSelectedMealId(null)})
+      }
+      />
     </View>
   )
 }

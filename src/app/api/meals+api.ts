@@ -52,6 +52,32 @@ export async function GET(request: Request) {
     )
 }
 
+export async function DELETE(request: Request) {
+    const clerkUserId = await getAuthUserId(request)
+    if (!clerkUserId) return unauthorized()
+
+    const id = new URL(request.url).searchParams.get('id')
+    if (!id) return Response.json({ error: 'Expected ?id=<mealId>' }, { status: 400 })
+
+    const [user] = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.clerkUserId, clerkUserId))
+
+    if (!user) return Response.json({ error: 'Finish onboarding first' }, { status: 409 })
+
+    // Scoped to this user's own id, not just the meal id — otherwise anyone signed in
+    // could delete another user's meal by guessing/observing a uuid.
+    const [deleted] = await db
+        .delete(meals)
+        .where(and(eq(meals.id, id), eq(meals.userId, user.id)))
+        .returning({ id: meals.id })
+
+    if (!deleted) return Response.json({ error: 'Meal not found' }, { status: 404 })
+
+    return Response.json({ ok: true })
+}
+
 const logMealSchema = z.object({
     image: z.string().min(100).max(12_000_000),
 })

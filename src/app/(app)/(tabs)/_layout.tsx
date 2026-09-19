@@ -1,39 +1,9 @@
-import { useAuth } from '@clerk/expo';
 import { MaterialIcons } from '@expo/vector-icons';
-import { Redirect, Tabs } from 'expo-router';
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { Tabs } from 'expo-router';
+import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useProfile } from '@/lib/api';
-
-export default function AppLayout() {
-    const { isLoaded, isSignedIn } = useAuth();
-    const { data: profile, isPending, isError, refetch } = useProfile();
-
-    if (!isLoaded) return null;
-    if (!isSignedIn) return <Redirect href="/" />;
-    if (isPending) return <Centered />;
-
-    if (isError) {
-        return (
-            <Centered>
-                <Text className="text-center text-[16px] leading-[22px] text-[#4A4A52]">
-                    We couldn&apos;t load your profile.
-                </Text>
-                <Pressable
-                    onPress={() => refetch()}
-                    className="mt-[16px] h-[44px] items-center justify-center rounded-full bg-black px-[26px] active:opacity-90"
-                >
-                    <Text className="text-[15px] font-semibold text-white">Retry</Text>
-                </Pressable>
-            </Centered>
-        );
-    }
-
-    if (!profile?.onboardingCompletedAt) {
-        return <Redirect href={{ pathname: '/onboarding/[step]', params: { step: 'gender' } }} />;
-    }
-
+export default function TabsLayout() {
     return (
         <Tabs
             screenOptions={{
@@ -98,14 +68,6 @@ function CustomTabBar({ state, navigation }: any) {
                     </Pressable>
                 );
             })}
-        </View>
-    );
-}
-
-function Centered({ children }: { children?: React.ReactNode }) {
-    return (
-        <View className="flex-1 items-center justify-center bg-[#FEFDFD] px-[40px]">
-            {children ?? <ActivityIndicator color="#000000" />}
         </View>
     );
 }

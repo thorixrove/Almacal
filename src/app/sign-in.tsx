@@ -4,7 +4,7 @@ import * as Linking from 'expo-linking';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SymbolView } from 'expo-symbols';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -31,37 +31,40 @@ export default function SignIn() {
     router.replace('/home');
   };
 
+
+  // Navigate only once Clerk's context has actually caught up to isSignedIn=true.
+  // Doing this reactively (instead of right after setActive resolves) avoids a
+  // race where (app)/app-layout mounts, reads a still-stale isSignedIn=false,
+  // and bounces back to "/" before the context finishes updating.
+  useEffect(() => {
+    if (isSignedIn) finish()
+  }, [isSignedIn])
+
   const signInWith = async (strategy: Provider) => {
-    if (busy) return;
-    setBusy(strategy);
-    setError(null);
+    if (busy) return
+    setBusy(strategy)
+    setError(null)
     try {
-      // already signed in means the save failed last time — retry just that
-      if (isSignedIn) {
-        await finish();
-        return;
-      }
+      if (isSignedIn) return
 
       const { createdSessionId, setActive, signUp } = await startSSOFlow({
         strategy,
-        redirectUrl: Linking.createURL('/', { scheme: 'almacal' }),
-      });
+        redirectUrl: Linking.createURL('/', { scheme: 'almacal'}),
+      })
       if (createdSessionId && setActive) {
-        await setActive({ session: createdSessionId });
-        await finish();
-        return;
+        await setActive({ session: createdSessionId})
+        return
       }
       if (signUp?.status === 'missing_requirements') {
-        setError('Your account needs a few more details. Please try the other provider.');
+        setError('Your account needs a few more details. Please try the other provider.')
       }
-      // otherwise the sheet was dismissed — stay put, say nothing
-    } catch (err) {
-      setError('Something went wrong. Please try again.');
-      console.error('SSO error:', JSON.stringify(err, null, 2));
+    } catch (error) {
+      setError('Somthing went wrong. Please try again.')
+      console.error('SSO error:', JSON.stringify(error, null, 2))
     } finally {
-      setBusy(null);
+      setBusy(null)
     }
-  };
+  }
 
   return (
     <View
@@ -106,9 +109,8 @@ export default function SignIn() {
           <Pressable
             onPress={() => signInWith('oauth_apple')}
             disabled={busy !== null}
-            className={`h-[52px] flex-row items-center justify-center rounded-[15px] bg-black ${
-              busy ? 'opacity-60' : 'active:opacity-90'
-            }`}>
+            className={`h-[52px] flex-row items-center justify-center rounded-[15px] bg-black ${busy ? 'opacity-60' : 'active:opacity-90'
+              }`}>
             {busy === 'oauth_apple' ? (
               <ActivityIndicator color="#FFFFFF" />
             ) : (
@@ -125,9 +127,8 @@ export default function SignIn() {
         <Pressable
           onPress={() => signInWith('oauth_google')}
           disabled={busy !== null}
-          className={`mt-[12px] h-[52px] flex-row items-center justify-center rounded-[15px] border border-[#DEDEE2] bg-white ${
-            busy ? 'opacity-60' : 'active:opacity-90'
-          }`}>
+          className={`mt-[12px] h-[52px] flex-row items-center justify-center rounded-[15px] border border-[#DEDEE2] bg-white ${busy ? 'opacity-60' : 'active:opacity-90'
+            }`}>
           {busy === 'oauth_google' ? (
             <ActivityIndicator color="#000000" />
           ) : (

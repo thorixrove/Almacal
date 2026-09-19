@@ -21,20 +21,20 @@ export function StreakSheet({ streak, onClose }: { streak: number; onClose: () =
             <Pressable className="flex-1 justify-end bg-black/40" onPress={onClose}>
                 <Animated.View entering={SlideInDown.duration(320)}>
                     <Pressable
-                        className="rounded-t-[28px] bg-[#FEFDFD] px-[26px] pt-[26px]"
+                        className="rounded-t-[28px] bg-[#FEFDFD] dark:bg-[#1C1C1E] px-[26px] pt-[26px]"
                         style={{ paddingBottom: insets.bottom + 22 }}
                     >
-                        <View className="h-[5px] w-[42px] self-center rounded-full bg-[#E2E2E7]" />
+                        <View className="h-[5px] w-[42px] self-center rounded-full bg-[#E2E2E7] dark:bg-[#3A3A3C]" />
 
                         <View className="mt-[24px] items-center">
-                            <View className="h-[86px] w-[86px] items-center justify-center rounded-full bg-[#FDECEA]">
+                            <View className="h-[86px] w-[86px] items-center justify-center rounded-full bg-[#FDECEA] dark:bg-[#3A2220]">
                                 <SymbolView name="flame.fill" size={42} tintColor="#F4685C" />
                             </View>
-                            <Text className="mt-[16px] text-[46px] font-bold leading-[52px] tracking-[-1px] text-black">
+                            <Text className="mt-[16px] text-[46px] font-bold leading-[52px] tracking-[-1px] text-black dark:text-white">
                                 {streak}
                             </Text>
-                            <Text className="mt-[2px] text-[16px] text-[#6E6E78]">day streak</Text>
-                            <Text className="mt-[14px] text-center text-[16px] leading-[22px] text-[#6E6E78]">
+                            <Text className="mt-[2px] text-[16px] text-[#6E6E78] dark:text-[#9A9AA0]">day streak</Text>
+                            <Text className="mt-[14px] text-center text-[16px] leading-[22px] text-[#6E6E78] dark:text-[#9A9AA0]">
                                 {line(streak)}
                             </Text>
                         </View>

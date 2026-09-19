@@ -112,6 +112,7 @@ export default function profile() {
             onPress: async () => {
               await signOut()
               queryClient.clear()
+              router.replace('/sign-in')
             },
           },
         ],

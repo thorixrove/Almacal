@@ -1,5 +1,6 @@
 import { Ionicons } from '@react-native-vector-icons/ionicons/static';
 import { Image } from 'expo-image';
+import { useColorScheme } from 'nativewind';
 import { useEffect, useRef, type ComponentProps } from 'react';
 import {
   ActivityIndicator,
@@ -69,6 +70,8 @@ export function MealDetailSheet({
     dailyTarget: { protein: number; carbs: number; fat: number }
 }) {
     const insets = useSafeAreaInsets();
+    const { colorScheme } = useColorScheme();
+    const isDark = colorScheme === 'dark';
 
     const translateY = useRef(new Animated.Value(0)).current
 
@@ -115,11 +118,11 @@ export function MealDetailSheet({
                     // Swallow taps so they don't bubble to the backdrop's onPress and close the sheet.
                     <Pressable onPress={() => { }} style={{ maxHeight: MAX_SHEET_HEIGHT }}>
                         <Animated.View 
-                        className="rounded-t-[28px] bg-white"
+                        className="rounded-t-[28px] bg-white dark:bg-[#1C1C1E]"
                         style={{ transform: [{ translateY}]}}
                         >
                             <View {...panResponder.panHandlers} className="items-center py-[14px]">
-                                <View className="h-[4px] w-[36px] rounded-full bg-[#E2E2E6]" />
+                                <View className="h-[4px] w-[36px] rounded-full bg-[#E2E2E6] dark:bg-[#3A3A3C]" />
                             </View>
                             <ScrollView
                                 showsVerticalScrollIndicator={false}
@@ -133,7 +136,7 @@ export function MealDetailSheet({
                                         transition={200}
                                     />
                                     <View className="ml-[14px] flex-1">
-                                        <Text numberOfLines={2} className="text-[18px] font-bold text-black">
+                                        <Text numberOfLines={2} className="text-[18px] font-bold text-black dark:text-white">
                                             {meal.status === 'completed'
                                                 ? meal.name
                                                 : meal.status === 'analyzing'
@@ -142,7 +145,7 @@ export function MealDetailSheet({
                                                         ? 'Not food'
                                                         : "Couldn't read this one"}
                                         </Text>
-                                        <Text className="mt-[2px] text-[13px] text-[#8A8A90]">
+                                        <Text className="mt-[2px] text-[13px] text-[#8A8A90] dark:text-[#9A9AA0]">
                                             {meal.loggedAt.toLocaleTimeString('en-US', {
                                                 hour: 'numeric',
                                                 minute: '2-digit',
@@ -155,11 +158,11 @@ export function MealDetailSheet({
 
                                 {meal.status === 'completed' ? (
                                     <>
-                                        <View className="mt-[20px] flex-row items-center justify-center rounded-[16px] bg-[#F8F8FA] py-[14px]">
-                                            <Text className="text-[30px] font-bold leading-[34px] text-black">
+                                        <View className="mt-[20px] flex-row items-center justify-center rounded-[16px] bg-[#F8F8FA] dark:bg-[#242426] py-[14px]">
+                                            <Text className="text-[30px] font-bold leading-[34px] text-black dark:text-white">
                                                 {meal.calories}
                                             </Text>
-                                            <Text className="ml-[6px] text-[14px] font-medium text-[#8A8A90]">kcal</Text>
+                                            <Text className="ml-[6px] text-[14px] font-medium text-[#8A8A90] dark:text-[#9A9AA0]">kcal</Text>
                                         </View>
 
                                         <View className="mt-[16px] flex-row gap-[10px]">
@@ -169,23 +172,23 @@ export function MealDetailSheet({
                                                 return (
                                                     <View
                                                         key={macro.key}
-                                                        className="flex-1 items-center rounded-[16px] border border-[#EDEDEF] py-[14px]"
+                                                        className="flex-1 items-center rounded-[16px] border border-[#EDEDEF] dark:border-[#2C2C2E] py-[14px]"
                                                     >
-                                                        <Ring size={40} stroke={5} progress={progress} color={macro.color}>
+                                                        <Ring size={40} stroke={5} progress={progress} color={macro.color} track={isDark ? '#3A3A3C' : '#EDEDF5'}>
                                                             <Ionicons name={MACRO_VECTOR_ICON[macro.key]} size={15} color={macro.color} />
                                                         </Ring>
-                                                        <Text className="mt-[8px] text-[15px] font-bold text-black">
+                                                        <Text className="mt-[8px] text-[15px] font-bold text-black dark:text-white">
                                                             {meal[macro.key]}g
                                                         </Text>
-                                                        <Text className="mt-[1px] text-[11px] text-[#8A8A90]">{macro.label}</Text>
+                                                        <Text className="mt-[1px] text-[11px] text-[#8A8A90] dark:text-[#9A9AA0]">{macro.label}</Text>
                                                     </View>
                                                 )
                                             })}
                                         </View>
                                     </>
                                 ) : meal.status === 'analyzing' ? (
-                                    <View className="mt-[20px] items-center rounded-[16px] bg-[#F8F8FA] py-[24px]">
-                                        <ActivityIndicator color="#8A8A90" />
+                                    <View className="mt-[20px] items-center rounded-[16px] bg-[#F8F8FA] dark:bg-[#242426] py-[24px]">
+                                        <ActivityIndicator color={isDark ? '#9A9AA0' : '#8A8A90'} />
                                     </View>
                                 ) : null}
                                 <Pressable

@@ -110,9 +110,14 @@ export default function profile() {
             text: 'Yes',
             style: 'destructive',
             onPress: async () => {
-              await signOut()
-              queryClient.clear()
-              router.replace('/sign-in')
+              try {
+                await signOut()
+                // Navigasi ke /sign-in ditangani guard di (app)/_layout.tsx begitu isSignedIn jadi false
+                queryClient.clear()
+              } catch (error) {
+                Sentry.logger.error('Sign out failed', { reason: String(error) })
+                Alert.alert('Sign out failed', 'Please try again.')
+              }
             },
           },
         ],

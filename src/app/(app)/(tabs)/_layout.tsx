@@ -1,9 +1,21 @@
+import { useAuth } from '@clerk/expo';
 import { MaterialIcons } from '@expo/vector-icons';
-import { Tabs } from 'expo-router';
+import { Redirect, Tabs } from 'expo-router';
+import { useEffect } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabsLayout() {
+    const { isLoaded, isSignedIn } = useAuth();
+
+
+        useEffect(() => {
+        console.log(`[tabs] mounted @ ${Date.now()}`);
+    }, []);
+
+    if (!isLoaded) return null;
+    if (!isSignedIn) return <Redirect href="/sign-in" />;
+
     return (
         <Tabs
             screenOptions={{

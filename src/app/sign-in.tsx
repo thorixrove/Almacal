@@ -13,6 +13,10 @@ import { draft } from '@/onboarding/steps';
 
 type Provider = 'oauth_apple' | 'oauth_google';
 
+// Di log, router.replace('/home') terpanggil 2-5x per login. Flag di level modul ini
+// memastikan finish() cuma jalan sekali sampai user sign out (atau penyimpanan gagal).
+let finishing = false;
+
 export default function SignIn() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -27,44 +31,77 @@ export default function SignIn() {
 
   /** A plan generated before sign-up is persisted the moment there's an account. */
   const finish = async () => {
-    if (draft.plan) await save.mutateAsync();
-    router.replace('/home');
+    if (finishing) return;
+    finishing = true;
+    const t0 = Date.now();
+    try {
+      if (draft.plan) {
+        await save.mutateAsync();
+        console.log(`[sign-in] simpan profil selesai: ${Date.now() - t0} ms`);
+      }
+      router.replace('/home');
+      console.log(`[sign-in] router.replace('/home') dipanggil @ ${Date.now()} (+${Date.now() - t0} ms)`);
+    } catch {
+      // gagal simpan: lepas spinner supaya user bisa mencoba lagi lewat tombol
+      finishing = false;
+      setBusy(null);
+      setError('We couldn’t save your plan. Please try again.');
+    }
   };
-
 
   // Navigate only once Clerk's context has actually caught up to isSignedIn=true.
   // Doing this reactively (instead of right after setActive resolves) avoids a
   // race where (app)/app-layout mounts, reads a still-stale isSignedIn=false,
   // and bounces back to "/" before the context finishes updating.
   useEffect(() => {
-    if (isSignedIn) finish()
-  }, [isSignedIn])
+    if (isSignedIn) finish();
+    else finishing = false; // sudah sign out — izinkan login berikutnya
+  }, [isSignedIn]);
+
+  useEffect(() => {
+    console.log(`[sign-in] mounted @ ${Date.now()}`)
+    return () => console.log(`[sign-in] unmounted @ ${Date.now()}`)
+  }, [])
 
   const signInWith = async (strategy: Provider) => {
-    if (busy) return
-    setBusy(strategy)
-    setError(null)
+    if (busy) return;
+    setBusy(strategy);
+    setError(null);
+    let keepBusy = false;
     try {
-      if (isSignedIn) return
+      // already signed in means the save failed last time — retry it from here
+      if (isSignedIn) {
+        await finish();
+        return;
+      }
 
+      const t0 = Date.now();
       const { createdSessionId, setActive, signUp } = await startSSOFlow({
         strategy,
-        redirectUrl: Linking.createURL('/', { scheme: 'almacal'}),
-      })
+        redirectUrl: Linking.createURL('/auth-callback', { scheme: 'almacal' }),
+      });
+      console.log(`[sign-in] startSSOFlow selesai: ${Date.now() - t0} ms`);
       if (createdSessionId && setActive) {
-        await setActive({ session: createdSessionId})
-        return
+        const t1 = Date.now();
+        await setActive({ session: createdSessionId });
+        console.log(`[sign-in] setActive selesai: ${Date.now() - t1} ms`);
+        // don't navigate here — the isSignedIn effect above handles it once Clerk's
+        // context has updated. Keep the spinner on until then (busy is cleared by
+        // finish() on failure, or when this screen unmounts on success).
+        keepBusy = true;
+        return;
       }
       if (signUp?.status === 'missing_requirements') {
-        setError('Your account needs a few more details. Please try the other provider.')
+        setError('Your account needs a few more details. Please try the other provider.');
       }
-    } catch (error) {
-      setError('Somthing went wrong. Please try again.')
-      console.error('SSO error:', JSON.stringify(error, null, 2))
+      // otherwise the sheet was dismissed — stay put, say nothing
+    } catch (err) {
+      setError('Something went wrong. Please try again.');
+      console.error('SSO error:', JSON.stringify(err, null, 2));
     } finally {
-      setBusy(null)
+      if (!keepBusy) setBusy(null);
     }
-  }
+  };
 
   return (
     <View
@@ -109,8 +146,9 @@ export default function SignIn() {
           <Pressable
             onPress={() => signInWith('oauth_apple')}
             disabled={busy !== null}
-            className={`h-[52px] flex-row items-center justify-center rounded-[15px] bg-black ${busy ? 'opacity-60' : 'active:opacity-90'
-              }`}>
+            className={`h-[52px] flex-row items-center justify-center rounded-[15px] bg-black ${
+              busy ? 'opacity-60' : 'active:opacity-90'
+            }`}>
             {busy === 'oauth_apple' ? (
               <ActivityIndicator color="#FFFFFF" />
             ) : (
@@ -127,8 +165,9 @@ export default function SignIn() {
         <Pressable
           onPress={() => signInWith('oauth_google')}
           disabled={busy !== null}
-          className={`mt-[12px] h-[52px] flex-row items-center justify-center rounded-[15px] border border-[#DEDEE2] bg-white ${busy ? 'opacity-60' : 'active:opacity-90'
-            }`}>
+          className={`mt-[12px] h-[52px] flex-row items-center justify-center rounded-[15px] border border-[#DEDEE2] bg-white ${
+            busy ? 'opacity-60' : 'active:opacity-90'
+          }`}>
           {busy === 'oauth_google' ? (
             <ActivityIndicator color="#000000" />
           ) : (

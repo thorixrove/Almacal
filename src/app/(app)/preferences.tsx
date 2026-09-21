@@ -7,7 +7,7 @@ import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { type Profile, useProfile, useUpdateProfile } from '@/lib/api';
-import { loadThemePreference, saveThemePreference, useThemeColors, type ThemePreference } from '@/lib/theme';
+import { useThemeColors, type ThemePreference } from '@/lib/theme';
 
 function Card({ children }: { children: ReactNode }) {
   return (
@@ -77,19 +77,20 @@ export default function Preferences() {
   // Resolved scheme (never 'system') — StatusBar needs the actual light/dark, not the preference.
   const { colorScheme: resolvedScheme } = useColorScheme();
 
-  const [themePreference, setThemePreference] = useState<ThemePreference | null>(null);
+  const [themePreference, setThemePreference] = useState<ThemePreference>(
+    (profile?.themePreference as ThemePreference | null) ?? 'system',
+  );
 
+  // profile.themePreference is the source of truth (per-account, synced by
+  // app-layout on login) — keep local state in step with it as it loads/changes.
   useEffect(() => {
-    loadThemePreference().then((pref) => {
-      setThemePreference(pref);
-      colorScheme.set(pref);
-    });
-  }, []);
+    if (profile?.themePreference) setThemePreference(profile.themePreference as ThemePreference);
+  }, [profile?.themePreference]);
 
   const chooseTheme = (value: ThemePreference) => {
     setThemePreference(value);
-    colorScheme.set(value);
-    saveThemePreference(value);
+    colorScheme.set(value); // instant local feedback
+    update.mutate({ themePreference: value }); // persist to the account
   };
 
   return (

@@ -10,19 +10,33 @@ export type Answers = PlanInput;
 
 // ponytail: plain module state, no AsyncStorage yet — add when the flow needs to
 // survive a background/kill (PLAN A5).
-export const answers: Partial<Answers> = {
+const defaultAnswers = (): Partial<Answers> => ({
     dateOfBirth: new Date(Date.now() - 25 * 31557600000).toISOString().slice(0, 10),
     heightCm: 175,
     weightKg: 70,
     targetWeightKg: 70,
     paceKgPerWeek: 0.5,
-};
+});
+
+export const answers: Partial<Answers> = defaultAnswers();
 
 /**
  * The plan `POST /api/plan` generated, held between the reveal screen and sign-up
  * (PLAN.md A6). It's POSTed with the profile and then lives in the DB.
  */
 export const draft: { plan?: Plan } = {};
+
+/**
+ * Wipe the questionnaire state once it has been saved to an account. Both objects are
+ * mutated in place because other modules hold a reference to them. Without this, the
+ * next person to sign in on the same app session inherits the previous person's plan
+ * and answers.
+ */
+export function resetOnboarding() {
+    for (const key of Object.keys(answers)) delete answers[key as keyof Answers];
+    Object.assign(answers, defaultAnswers());
+    delete draft.plan;
+}
 
 type Option = {
     value: string;

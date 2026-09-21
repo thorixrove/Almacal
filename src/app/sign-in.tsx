@@ -8,60 +8,34 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useSaveProfile } from '@/lib/api';
-import { draft } from '@/onboarding/steps';
-
 type Provider = 'oauth_apple' | 'oauth_google';
 
-// Di log, router.replace('/home') terpanggil 2-5x per login. Flag di level modul ini
-// memastikan finish() cuma jalan sekali sampai user sign out (atau penyimpanan gagal).
-let finishing = false;
+// router.replace('/home') sebelumnya terpanggil 2-5x per login. Flag di level modul ini
+// memastikan navigasi cuma sekali sampai user sign out.
+let navigated = false;
 
 export default function SignIn() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { startSSOFlow } = useSSO();
   const { isSignedIn } = useAuth();
-  const save = useSaveProfile();
   const [busy, setBusy] = useState<Provider | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // only show the plan chip to someone who just finished the questionnaire
-  const plan = draft.plan;
-
-  /** A plan generated before sign-up is persisted the moment there's an account. */
-  const finish = async () => {
-    if (finishing) return;
-    finishing = true;
-    const t0 = Date.now();
-    try {
-      if (draft.plan) {
-        await save.mutateAsync();
-        console.log(`[sign-in] simpan profil selesai: ${Date.now() - t0} ms`);
+  // Pindah hanya setelah Clerk benar-benar melaporkan isSignedIn=true (bukan tepat setelah
+  // setActive), supaya layout tujuan tidak membaca isSignedIn yang masih basi.
+  // Tujuannya /home: (app)/_layout yang memutuskan — profil belum ada → onboarding,
+  // sudah ada → tab.
+  useEffect(() => {
+    if (isSignedIn) {
+      if (!navigated) {
+        navigated = true;
+        router.replace('/home');
       }
-      router.replace('/home');
-      console.log(`[sign-in] router.replace('/home') dipanggil @ ${Date.now()} (+${Date.now() - t0} ms)`);
-    } catch {
-      // gagal simpan: lepas spinner supaya user bisa mencoba lagi lewat tombol
-      finishing = false;
-      setBusy(null);
-      setError('We couldn’t save your plan. Please try again.');
+    } else {
+      navigated = false; // sudah sign out — izinkan login berikutnya
     }
-  };
-
-  // Navigate only once Clerk's context has actually caught up to isSignedIn=true.
-  // Doing this reactively (instead of right after setActive resolves) avoids a
-  // race where (app)/app-layout mounts, reads a still-stale isSignedIn=false,
-  // and bounces back to "/" before the context finishes updating.
-  useEffect(() => {
-    if (isSignedIn) finish();
-    else finishing = false; // sudah sign out — izinkan login berikutnya
-  }, [isSignedIn]);
-
-  useEffect(() => {
-    console.log(`[sign-in] mounted @ ${Date.now()}`)
-    return () => console.log(`[sign-in] unmounted @ ${Date.now()}`)
-  }, [])
+  }, [isSignedIn, router]);
 
   const signInWith = async (strategy: Provider) => {
     if (busy) return;
@@ -69,25 +43,20 @@ export default function SignIn() {
     setError(null);
     let keepBusy = false;
     try {
-      // already signed in means the save failed last time — retry it from here
+      // sudah login tapi masih di layar ini: navigasi sebelumnya gagal, ulangi
       if (isSignedIn) {
-        await finish();
+        router.replace('/home');
         return;
       }
 
-      const t0 = Date.now();
       const { createdSessionId, setActive, signUp } = await startSSOFlow({
         strategy,
         redirectUrl: Linking.createURL('/auth-callback', { scheme: 'almacal' }),
       });
-      console.log(`[sign-in] startSSOFlow selesai: ${Date.now() - t0} ms`);
       if (createdSessionId && setActive) {
-        const t1 = Date.now();
         await setActive({ session: createdSessionId });
-        console.log(`[sign-in] setActive selesai: ${Date.now() - t1} ms`);
-        // don't navigate here — the isSignedIn effect above handles it once Clerk's
-        // context has updated. Keep the spinner on until then (busy is cleared by
-        // finish() on failure, or when this screen unmounts on success).
+        // jangan pindah di sini — effect di atas yang menangani begitu isSignedIn true.
+        // Spinner dibiarkan menyala sampai layar ini ditutup.
         keepBusy = true;
         return;
       }
@@ -122,23 +91,11 @@ export default function SignIn() {
           contentFit="contain"
         />
         <Text className="mt-[26px] text-center text-[32px] font-bold leading-[38px] text-black">
-          Save your plan
+          Welcome to AlmaCal
         </Text>
         <Text className="mt-[8px] w-[290px] text-center text-[17px] leading-[23px] text-[#4A4A52]">
-          Sign in to keep your targets, streak and meal history on every device.
+          Sign in to build your personal calorie plan and keep your progress on every device.
         </Text>
-
-        {plan ? (
-          <View className="mt-[26px] flex-row items-center rounded-full border border-[#EDEDEF] bg-white px-[18px] py-[10px]">
-            <SymbolView name="checkmark.circle.fill" size={17} tintColor="#000000" />
-            <Text className="ml-[8px] text-[15px] leading-[20px] text-[#4A4A52]">
-              Your plan is ready —{' '}
-              <Text className="font-semibold text-black">
-                {plan.calories.toLocaleString('en-US')} cal / day
-              </Text>
-            </Text>
-          </View>
-        ) : null}
       </View>
 
       <View className="px-[26px]">

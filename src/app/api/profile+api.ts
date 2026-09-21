@@ -1,5 +1,5 @@
 import { createClerkClient } from "@clerk/backend";
-import { eq } from "drizzle-orm";
+import { eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 
 import { db, users } from "@/db";
@@ -19,6 +19,7 @@ const PROFILE_COLUMNS = {
   paceKgPerWeek: users.paceKgPerWeek,
   dietPreference: users.dietPreference,
   unitPreference: users.unitPreference,
+  themePreference: users.themePreference,
   timezone: users.timezone,
   dailyCalories: users.dailyCalories,
   proteinG: users.proteinG,
@@ -44,6 +45,7 @@ const saveProfileSchema = planInputSchema.extend({
 
 const updateProfileSchema = planInputSchema.partial().extend({
   unitPreference: z.enum(["metric", "imperial"]).optional(),
+  themePreference: z.enum(["light", "dark", "system"]).optional(),
 });
 
 /** Profile + targets, or `null` for a user who hasn't finished onboarding. */
@@ -65,6 +67,11 @@ export async function GET(request: Request) {
  * Upsert, never a plain insert: the Clerk webhook may or may not have created the
  * row yet, and either order has to produce exactly one row (PLAN.md "Race
  * condition, handled"). `email` is left alone here — the webhook owns it.
+ *
+ * First save wins: once a row has `onboardingCompletedAt`, this never overwrites it.
+ * A returning user who redoes the questionnaire before signing in keeps their
+ * existing profile (they change targets via PATCH). The guard is part of the upsert
+ * itself (`setWhere`), so it stays correct even with two requests racing.
  */
 export async function POST(request: Request) {
   const clerkUserId = await getAuthUserId(request);
@@ -91,14 +98,22 @@ export async function POST(request: Request) {
     onboardingCompletedAt: now,
   };
 
-  const [profile] = await db
+  const [saved] = await db
     .insert(users)
     .values({ clerkUserId, ...columns })
     .onConflictDoUpdate({
       target: users.clerkUserId,
       set: { ...columns, updatedAt: now }, // $onUpdate doesn't fire on conflict-update
+      // only fill in a row that hasn't finished onboarding yet (e.g. created by the webhook)
+      setWhere: isNull(users.onboardingCompletedAt),
     })
     .returning(PROFILE_COLUMNS);
+
+  // RETURNING is empty when setWhere skipped the update: the profile already existed,
+  // so hand back the stored one instead of the draft the client just sent.
+  const [profile] = saved
+    ? [saved]
+    : await db.select(PROFILE_COLUMNS).from(users).where(eq(users.clerkUserId, clerkUserId));
 
   return Response.json(profile);
 }

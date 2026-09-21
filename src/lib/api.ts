@@ -23,6 +23,7 @@ export type Profile = Pick<
   | 'paceKgPerWeek'
   | 'dietPreference'
   | 'unitPreference'
+  | 'themePreference'
   | 'timezone'
   | 'dailyCalories'
   | 'proteinG'

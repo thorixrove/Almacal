@@ -5,7 +5,13 @@ export type ThemePreference = 'light' | 'dark' | 'system';
 
 const STORAGE_KEY = 'theme-preference';
 
-/** Device-local only — this is a display setting, not account data. */
+/**
+ * Guest-only fallback — used before sign-in (WelcomeScreen, sign-in, onboarding),
+ * where there's no account yet to hold a real preference. Once signed in, the
+ * account's `themePreference` (synced via useProfile/useUpdateProfile) is the
+ * source of truth, and this device-local value gets overwritten by app-layout's
+ * sync effect on every login.
+ */
 export async function loadThemePreference(): Promise<ThemePreference> {
   const value = await SecureStore.getItemAsync(STORAGE_KEY);
   return value === 'light' || value === 'dark' ? value : 'system';

@@ -8,8 +8,17 @@ export default function AppLayout() {
     const { isLoaded, isSignedIn } = useAuth();
     const { data: profile, isPending, isError, refetch } = useProfile();
 
+    // TEMP DEBUG — hapus setelah gerbang onboarding terbukti jalan
+    console.log('[gate]', JSON.stringify({
+        isLoaded,
+        isSignedIn,
+        isPending,
+        isError,
+        onboardedAt: profile?.onboardingCompletedAt ?? null,
+    }));
+
     if (!isLoaded) return null;
-    if (!isSignedIn) return <Redirect href="/" />;
+    if (!isSignedIn) return <Redirect href="/sign-in" />;
     if (isPending) return <Centered />;
 
     if (isError) {
@@ -28,6 +37,7 @@ export default function AppLayout() {
         );
     }
 
+    // Login sudah terjadi di awal; user baru (belum ada profil) diarahkan mengisi biodata.
     if (!profile?.onboardingCompletedAt) {
         return <Redirect href={{ pathname: '/onboarding/[step]', params: { step: 'gender' } }} />;
     }

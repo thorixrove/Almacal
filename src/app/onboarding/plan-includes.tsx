@@ -2,12 +2,12 @@ import { useAuth } from '@clerk/expo';
 import { Ionicons } from '@react-native-vector-icons/ionicons/static';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { type ComponentProps } from 'react';
+import { useState, type ComponentProps } from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useSaveProfile } from '@/lib/api';
-import { answers } from '@/onboarding/steps';
+import { answers, resetOnboarding } from '@/onboarding/steps';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -24,13 +24,25 @@ export default function PlanIncludes() {
   const router = useRouter();
   const { isSignedIn } = useAuth();
   const save = useSaveProfile();
-  const target = answers.targetWeightKg?.toFixed(1);
+  // dibaca sekali: answers direset setelah tersimpan, jangan sampai teks ikut berubah
+  const [target] = useState(() => answers.targetWeightKg?.toFixed(1));
 
-  // someone who redid onboarding is already signed in — no reason to ask again
-  const onContinue = () =>
-    isSignedIn
-      ? save.mutate(undefined, { onSuccess: () => router.replace('/home') })
-      : router.push('/sign-in');
+  // Login sudah terjadi di awal, jadi di sini tinggal menyimpan. Kalau ternyata belum
+  // login (mis. deep link langsung ke layar ini), kembalikan ke sign-in.
+  const onContinue = () => {
+    if (!isSignedIn) {
+      router.replace('/sign-in');
+      return;
+    }
+    save.mutate(undefined, {
+      onSuccess: () => {
+        // tutup seluruh tumpukan onboarding supaya tombol back dari Home tidak kembali ke sini
+        if (router.canDismiss()) router.dismissAll();
+        router.replace('/home');
+        resetOnboarding();
+      },
+    });
+  };
 
   return (
     <View

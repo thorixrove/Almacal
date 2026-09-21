@@ -1,6 +1,7 @@
 import { useAuth } from '@clerk/expo';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Redirect, Tabs } from 'expo-router';
+import { useColorScheme } from 'nativewind';
 import { useEffect } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -41,11 +42,13 @@ const ICONS: Record<string, keyof typeof MaterialIcons.glyphMap> = {
 
 function CustomTabBar({ state, navigation }: any) {
     const insets = useSafeAreaInsets();
+    const { colorScheme } = useColorScheme();
+    const isDark = colorScheme === 'dark';
 
     return (
         <View
             style={{ bottom: insets.bottom + 12 }}
-            className="absolute left-[40px] right-[40px] flex-row items-center justify-between rounded-[50px] bg-white px-[15px] py-[5px] shadow-lg"
+            className="absolute left-[40px] right-[40px] flex-row items-center justify-between rounded-[50px] bg-white px-[15px] py-[5px] shadow-lg dark:bg-[#000000]"
         >
             {state.routes.map((route: any, index: number) => {
                 const focused = state.index === index;
@@ -62,17 +65,17 @@ function CustomTabBar({ state, navigation }: any) {
                         key={route.key}
                         onPress={onPress}
                         className={`flex-1 items-center justify-center rounded-[50px] py-[10px] ${
-                            focused ? 'bg-[#c0c0c0]' : ''
+                            focused ? (isDark ? 'bg-[#3A3A3E]' : 'bg-[#c0c0c0]') : ''
                         }`}
                     >
                         <MaterialIcons
                             name={ICONS[route.name]}
                             size={25}
-                            color={focused ? '#FFFFFF' : '#9A9AA0'}
+                            color={focused ? '#FFFFFF' : isDark ? '#7A7A80' : '#9A9AA0'}
                         />
                         <Text
                             className={`mt-[2px] text-[10px] ${
-                                focused ? 'font-semibold text-white' : 'text-[#9A9AA0]'
+                                focused ? 'font-semibold text-white' : isDark ? 'text-[#7A7A80]' : 'text-[#9A9AA0]'
                             }`}
                         >
                             {label}

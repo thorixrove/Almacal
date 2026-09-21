@@ -1,20 +1,20 @@
 import { Ionicons } from '@react-native-vector-icons/ionicons/static';
 import { Image } from 'expo-image';
 import { useColorScheme } from 'nativewind';
-import { useEffect, useRef, type ComponentProps } from 'react';
+import { useEffect, useRef, useState, type ComponentProps } from 'react';
 import {
-  ActivityIndicator,
-  Animated,
-  Dimensions,
-  Modal,
-  PanResponder,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
+    ActivityIndicator,
+    Animated,
+    Dimensions,
+    Modal,
+    PanResponder,
+    Pressable,
+    ScrollView,
+    Text,
+    View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
- 
+
 import { Ring } from '@/components/ring';
 import { MACROS } from '@/constants/macros';
 
@@ -74,9 +74,12 @@ export function MealDetailSheet({
     const isDark = colorScheme === 'dark';
 
     const translateY = useRef(new Animated.Value(0)).current
+    const [confirming, setConfirming] = useState(false)
 
     useEffect(() => {
-        if (meal) translateY.setValue(0)
+        if (meal)
+            translateY.setValue(0)
+        setConfirming(false)
     }, [meal?.id])
 
     const panResponder = useRef(
@@ -86,20 +89,20 @@ export function MealDetailSheet({
             onPanResponderMove: (_, gesture) => {
                 if (gesture.dy > 0) translateY.setValue(gesture.dy)
             },
-        onPanResponderRelease: (_, gesture) => {
-            const shouldClose =
-            gesture.dy > DRAG_TO_CLOSE_THRESHOLD || gesture.vy > DRAG_TO_CLOSE_VELOCITY
+            onPanResponderRelease: (_, gesture) => {
+                const shouldClose =
+                    gesture.dy > DRAG_TO_CLOSE_THRESHOLD || gesture.vy > DRAG_TO_CLOSE_VELOCITY
 
-            if (shouldClose) {
-                Animated.timing(translateY, {
-                    toValue: Dimensions.get('window').height,
-                    duration: 180,
-                    useNativeDriver: true
-                }).start(onClose)
-            } else {
-                Animated.spring(translateY, { toValue: 0, useNativeDriver: true, bounciness: 4}).start()
-            }
-        },
+                if (shouldClose) {
+                    Animated.timing(translateY, {
+                        toValue: Dimensions.get('window').height,
+                        duration: 180,
+                        useNativeDriver: true
+                    }).start(onClose)
+                } else {
+                    Animated.spring(translateY, { toValue: 0, useNativeDriver: true, bounciness: 4 }).start()
+                }
+            },
         }),
     ).current
 
@@ -117,9 +120,9 @@ export function MealDetailSheet({
                 {meal ? (
                     // Swallow taps so they don't bubble to the backdrop's onPress and close the sheet.
                     <Pressable onPress={() => { }} style={{ maxHeight: MAX_SHEET_HEIGHT }}>
-                        <Animated.View 
-                        className="rounded-t-[28px] bg-white dark:bg-[#1C1C1E]"
-                        style={{ transform: [{ translateY}]}}
+                        <Animated.View
+                            className="rounded-t-[28px] bg-white dark:bg-[#1C1C1E]"
+                            style={{ transform: [{ translateY }] }}
                         >
                             <View {...panResponder.panHandlers} className="items-center py-[14px]">
                                 <View className="h-[4px] w-[36px] rounded-full bg-[#E2E2E6] dark:bg-[#3A3A3C]" />
@@ -191,21 +194,38 @@ export function MealDetailSheet({
                                         <ActivityIndicator color={isDark ? '#9A9AA0' : '#8A8A90'} />
                                     </View>
                                 ) : null}
-                                <Pressable
-                                    onPress={() => onDelete(meal.id)}
-                                    disabled={deleting}
-                                    className={`mt-[20px] h-[48px] flex-row items-center justify-center rounded-full border border-[#E5484D] ${deleting ? 'opacity-60' : 'active:bg-[#FBEAEA]'
-                                        }`}
-                                >
-                                    {deleting ? (
-                                        <ActivityIndicator color="#E5484D" />
-                                    ) : (
-                                        <>
-                                            <Ionicons name="trash-outline" size={17} color="#E5484D" />
-                                            <Text className="ml-[8px] text-[15px] font-semibold text-[#E5484D]">Delete</Text>
-                                        </>
-                                    )}
-                                </Pressable>
+
+                                {confirming ? (
+                                    <View className="mt-[20px] flex-row gap-[10px]">
+                                        <Pressable
+                                            onPress={() => setConfirming(false)}
+                                            disabled={deleting}
+                                            className="h-[48px] flex-1 items-center justify-center rounded-full border border-[#EDEDEF] dark:border-[#3A3A3C] active:bg-[#F3F3F7] dark:active:bg-[#242426]"
+                                        >
+                                            <Text className="text-[15px] font-semibold text-black dark:text-white">No</Text>
+                                        </Pressable>
+                                        <Pressable
+                                            onPress={() => onDelete(meal.id)}
+                                            disabled={deleting}
+                                            className={`h-[48px] flex-1 flex-row items-center justify-center rounded-full bg-[#E5484D] ${deleting ? 'opacity-60' : 'active:opacity-90'
+                                                }`}
+                                        >
+                                            {deleting ? (
+                                                <ActivityIndicator color="#FFFFFF" />
+                                            ) : (
+                                                <Text className="text-[15px] font-semibold text-white">Yes, delete</Text>
+                                            )}
+                                        </Pressable>
+                                    </View>
+                                ) : (
+                                    <Pressable
+                                        onPress={() => setConfirming(true)}
+                                        className="mt-[20px] h-[48px] flex-row items-center justify-center rounded-full border border-[#E5484D] active:bg-[#FBEAEA] dark:active:bg-[#3A1E1F]"
+                                    >
+                                        <Ionicons name="trash-outline" size={17} color="#E5484D" />
+                                        <Text className="ml-[8px] text-[15px] font-semibold text-[#E5484D]">Delete</Text>
+                                    </Pressable>
+                                )}
                             </ScrollView>
                         </Animated.View >
                     </Pressable>

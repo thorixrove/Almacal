@@ -122,6 +122,7 @@ export default function home() {
             source={require("@/assets/images/almacal.png")}
             style={{ width: 30, height: 30 }}
             contentFit="contain"
+            tintColor={colorScheme === 'dark' ? "#FFFFFF" : undefined}
           />
           <Text className="ml-[8px] text-[26px] font-bold tracking-[-0.6px] text-black dark:text-white">
             Almacal
@@ -160,15 +161,16 @@ export default function home() {
               >
                 <View
                   className="w-[46px] items-center rounded-[16px] py-[7px]"
-                  style={
-                    isSelected
-                      ? {
-                        backgroundColor: colorScheme === "dark" ? "#1C1C1E" : "#FFFFFF",
-                        borderWidth: 1,
-                        borderColor: colorScheme === "dark" ? "#2C2C2E" : "#EDEDEF",
-                      }
-                      : undefined
-                  }
+                  style={{
+                    borderRadius: 16,
+                    borderWidth: 1,
+                    backgroundColor: isSelected
+                    ? (colorScheme === "dark" ? "#1C1C1E" : "#FFFFFF")
+                    : "transparent",
+                    borderColor: isSelected
+                    ? (colorScheme === "dark" ?  "#2C2C2E" : "#EDEDEF")
+                    : "transparent",
+                  }}
                 >
                   <Text
                     className="text-[13px] font-medium"

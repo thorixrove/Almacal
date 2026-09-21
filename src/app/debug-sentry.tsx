@@ -2,9 +2,12 @@ import * as Sentry from '@sentry/react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SymbolView, type SFSymbol } from 'expo-symbols';
+import { useColorScheme } from 'nativewind';
 import { useState, type ReactNode } from 'react';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { useThemeColors } from '@/lib/theme';
 
 // ponytail: temporary QA screen for the Sentry dashboard — delete it (and the Profile
 // row that links here) once the alerts, issue grouping and log views are verified.
@@ -180,21 +183,21 @@ async function tracedFailingSpan() {
 
 function SectionTitle({ children }: { children: ReactNode }) {
   return (
-    <Text className="mb-[8px] ml-[26px] mt-[26px] text-[15px] font-medium text-[#8A8A90]">
+    <Text className="mb-[8px] ml-[26px] mt-[26px] text-[15px] font-medium text-[#8A8A90] dark:text-[#9A9AA0]">
       {children}
     </Text>
   );
 }
 
 function Card({ children }: { children: ReactNode }) {
-  return <View className="mx-[18px] overflow-hidden rounded-[20px] bg-white">{children}</View>;
+  return <View className="mx-[18px] overflow-hidden rounded-[20px] bg-white dark:bg-[#1C1C1E]">{children}</View>;
 }
 
 function Row({
   icon,
   label,
   onPress,
-  tint = '#000000',
+  tint,
   divider,
 }: {
   icon: SFSymbol;
@@ -203,12 +206,15 @@ function Row({
   tint?: string;
   divider?: boolean;
 }) {
+  const theme = useThemeColors();
+  const effectiveTint = tint ?? theme.icon;
+
   return (
-    <View style={divider ? { borderTopWidth: 1, borderTopColor: '#F1F1F3' } : undefined}>
-      <Pressable onPress={onPress} className="active:bg-[#F7F7F9]">
+    <View className={divider ? 'border-t border-[#F1F1F3] dark:border-[#2C2C2E]' : undefined}>
+      <Pressable onPress={onPress} className="active:bg-[#F7F7F9] dark:active:bg-[#242426]">
         <View className="flex-row items-center px-[18px] py-[15px]">
-          <SymbolView name={icon} size={21} tintColor={tint} style={{ width: 24, height: 24 }} />
-          <Text className="ml-[12px] flex-1 text-[17px]" style={{ color: tint }} numberOfLines={1}>
+          <SymbolView name={icon} size={21} tintColor={effectiveTint} style={{ width: 24, height: 24 }} />
+          <Text className="ml-[12px] flex-1 text-[17px]" style={{ color: effectiveTint }} numberOfLines={1}>
             {label}
           </Text>
         </View>
@@ -220,23 +226,24 @@ function Row({
 export default function DebugSentry() {
   const insets = useSafeAreaInsets();
   const [crash, setCrash] = useState(false);
+  const { colorScheme } = useColorScheme();
 
   if (crash) crashInRender();
 
   return (
-    <View className="flex-1 bg-[#F4F4F6]" style={{ paddingTop: insets.top }}>
-      <StatusBar style="dark" />
+    <View className="flex-1 bg-[#F4F4F6] dark:bg-[#0B0B0C]" style={{ paddingTop: insets.top }}>
+      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}>
         <View className="mt-[10px] flex-row items-center px-[22px]">
-          <Text className="flex-1 text-[34px] font-bold tracking-[-0.8px] text-black">Sentry</Text>
+          <Text className="flex-1 text-[34px] font-bold tracking-[-0.8px] text-black dark:text-white">Sentry</Text>
           <Pressable onPress={() => router.back()} hitSlop={12}>
-            <Text className="text-[17px] text-[#8A8A90]">Close</Text>
+            <Text className="text-[17px] text-[#8A8A90] dark:text-[#9A9AA0]">Close</Text>
           </Pressable>
         </View>
-        <Text className="mt-[4px] px-[22px] text-[15px] text-[#8A8A90]">
+        <Text className="mt-[4px] px-[22px] text-[15px] text-[#8A8A90] dark:text-[#9A9AA0]">
           Every button below sends something real to the dashboard.
         </Text>
 

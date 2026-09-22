@@ -1,4 +1,3 @@
-
 function authHeader() {
     const privateKey = process.env.IMAGEKIT_SECRET_KEY
     if (!privateKey) throw new Error("Add IMAGEKIT_SECRET_KEY to your .env file")
@@ -38,7 +37,10 @@ export async function deleteUserImages(userId: string) {
             skip: String(skip)
         })
 
-        const response = await fetch('https://api.imagekit.io/v1/files?${query}', {
+        // BUG lama: URL ini pakai kutip satu, jadi `${query}` tidak diinterpolasi dan
+        // searchQuery tidak pernah terkirim — ImageKit lalu me-list SEMUA file di akun,
+        // bukan cuma milik user ini, dan batch delete di bawah menghapus semuanya.
+        const response = await fetch(`https://api.imagekit.io/v1/files?${query}`, {
             headers: { Authorization: authHeader() },
         })
 

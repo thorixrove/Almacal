@@ -30,6 +30,7 @@ export type Profile = Pick<
   | 'carbsG'
   | 'fatG'
   | 'planRationale'
+  | 'languagePreference'
 > & {
   planGeneratedAt: string | null;
   onboardingCompletedAt: string | null;

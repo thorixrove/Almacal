@@ -9,6 +9,8 @@ import { LogBox } from "react-native";
 import { colorScheme } from "nativewind";
 
 import { loadThemePreference } from "@/lib/theme";
+import { loadLanguagePreference, applyLanguage } from "@/lib/language";
+import "@/lib/i18n";
 
 import "@/global.css";
 
@@ -78,6 +80,7 @@ function RootLayout() {
     <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
       <QueryClientProvider client={queryClient}>
         <ThemeGate />
+        <LanguageGate />
         <SentryUser />
         <Stack screenOptions={{ headerShown: false }} />
       </QueryClientProvider>
@@ -89,6 +92,14 @@ function RootLayout() {
 function ThemeGate() {
   useEffect(() => {
     loadThemePreference().then((preference) => colorScheme.set(preference))
+  }, [])
+
+  return null
+}
+
+function LanguageGate() {
+  useEffect(() => {
+    loadLanguagePreference().then(applyLanguage)
   }, [])
 
   return null

@@ -2,7 +2,7 @@ import { createClerkClient } from "@clerk/backend";
 import { eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 
-import { db, users } from "@/db";
+import { db, languagePreferenceEnum, users } from "@/db";
 import { deleteUserImages } from "@/lib/imagekit";
 import { planInputSchema } from "@/lib/plan";
 import { getAuthUserId, unauthorized } from "@/lib/server-auth";
@@ -29,6 +29,7 @@ const PROFILE_COLUMNS = {
   planGeneratedAt: users.planGeneratedAt,
   onboardingCompletedAt: users.onboardingCompletedAt,
   createdAt: users.createdAt,
+  languagePreference: users.languagePreference,
 };
 
 const saveProfileSchema = planInputSchema.extend({
@@ -46,6 +47,7 @@ const saveProfileSchema = planInputSchema.extend({
 const updateProfileSchema = planInputSchema.partial().extend({
   unitPreference: z.enum(["metric", "imperial"]).optional(),
   themePreference: z.enum(["light", "dark", "system"]).optional(),
+  languagePreference: z.enum(["en", "id", "system"]).optional(),
 });
 
 /** Profile + targets, or `null` for a user who hasn't finished onboarding. */
@@ -142,29 +144,29 @@ export async function PATCH(request: Request) {
   const clerkUserId = await getAuthUserId(request)
   if (!clerkUserId) return unauthorized()
 
-    const parsed = updateProfileSchema.safeParse(await request.json().catch(() => null))
-    if (!parsed.success) {
-      return Response.json(
-        { error: "Invalid profile", issues: parsed.error.issues},
-        { status: 400 },
-      )
-    }
+  const parsed = updateProfileSchema.safeParse(await request.json().catch(() => null))
+  if (!parsed.success) {
+    return Response.json(
+      { error: "Invalid profile", issues: parsed.error.issues },
+      { status: 400 },
+    )
+  }
 
-    if (Object.keys(parsed.data).length === 0) {
-      return Response.json({ error: "No fields to update"}, { status: 400})
-    }
+  if (Object.keys(parsed.data).length === 0) {
+    return Response.json({ error: "No fields to update" }, { status: 400 })
+  }
 
-    const [profile] = await  db
+  const [profile] = await db
     .update(users)
     .set({ ...parsed.data, updatedAt: new Date() })
     .where(eq(users.clerkUserId, clerkUserId))
     .returning(PROFILE_COLUMNS)
 
-    if (!profile) {
-      return Response.json({ error: "Finish onboarding first"}, { status: 404})
-    }
+  if (!profile) {
+    return Response.json({ error: "Finish onboarding first" }, { status: 404 })
+  }
 
-    return Response.json(profile)
+  return Response.json(profile)
 }
 
 export async function DELETE(request: Request) {

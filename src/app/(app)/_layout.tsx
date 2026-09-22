@@ -3,6 +3,9 @@ import { Redirect, Stack } from 'expo-router';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
 import { useProfile } from '@/lib/api';
+import { useEffect } from 'react';
+import { colorScheme } from 'nativewind';
+import { ThemePreference } from '@/lib/theme';
 
 export default function AppLayout() {
     const { isLoaded, isSignedIn } = useAuth();
@@ -16,6 +19,19 @@ export default function AppLayout() {
         isError,
         onboardedAt: profile?.onboardingCompletedAt ?? null,
     }));
+
+    useEffect(() => {
+        if (profile?.themePreference) colorScheme.set(profile.themePreference as ThemePreference)
+    }, [profile?.themePreference])
+
+
+    console.log('[gate]', JSON.stringify({
+        isLoaded,
+        isSignedIn,
+        isPending,
+        isError,
+        onboardedAt: profile?.onboardingCompletedAt ?? null,
+    }))
 
     if (!isLoaded) return null;
     if (!isSignedIn) return <Redirect href="/sign-in" />;

@@ -8,6 +8,7 @@ import { StatusBar } from 'expo-status-bar';
 import { openBrowserAsync } from 'expo-web-browser';
 import { useColorScheme } from 'nativewind';
 import { type ComponentProps, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -95,6 +96,7 @@ export default function profile() {
   const queryClient = useQueryClient()
   const theme = useThemeColors()
   const { colorScheme: resolvedScheme } = useColorScheme()
+  const { t } = useTranslation()
 
   const memberSince = user?.createdAt
     ? user.createdAt.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
@@ -154,7 +156,7 @@ export default function profile() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + BottomTabInset + 28 }}>
         <Text className="ml-[22px] mt-[10px] text-[34px] font-bold tracking-[-0.8px] text-black dark:text-white">
-          Profile
+          {t('profile.title')}
         </Text>
 
         <View className="mx-[18px] mt-[18px] flex-row items-center rounded-[20px] bg-white dark:bg-[#1C1C1E] p-[16px]">
@@ -179,31 +181,31 @@ export default function profile() {
         </View>
 
 
-        <SectionTitle>Account</SectionTitle>
+        <SectionTitle>{t('profile.account')}</SectionTitle>
         <Card>
-          <Row icon='calendar' label="Member since" value={memberSince} />
+          <Row icon='calendar' label={t('profile.memberSince')} value={memberSince} />
           <Row
             divider
             icon="card"
-            label="Personal Details"
+            label={t('profile.personalDetails')}
             onPress={() => router.push('/personal-details')}
           />
-          <Row divider icon="settings" label="Preferences" onPress={() => router.push('/preferences')} />
-          <Row divider icon="globe" label="Language" onPress={soon} />
-          <Row divider icon="people" label="Upgrade to Family Plan" onPress={soon} />
+          <Row divider icon="settings" label={t('profile.preferences')} onPress={() => router.push('/preferences')} />
+          <Row divider icon="globe" label={t('profile.language')} onPress={() => router.push('/language')} />
+          <Row divider icon="people" label={t('profile.familyPlan')} onPress={soon} />
         </Card>
 
-        <SectionTitle>About</SectionTitle>
+        <SectionTitle>{t('profile.about')}</SectionTitle>
         <Card>
           <Row
             icon='hand-left'
-            label='Privacy Policy'
+            label={t('profile.privacyPolicy')}
             onPress={() => openBrowserAsync(PRIVACY_URL)}
           />
           <Row
             divider
             icon='document-text'
-            label='Terms of Service'
+            label={t('profile.termsOfService')}
             onPress={() => openBrowserAsync(TERMS_URL)}
           />
           <Row
@@ -214,11 +216,11 @@ export default function profile() {
           />
         </Card>
 
-        <SectionTitle>Support</SectionTitle>
+        <SectionTitle>{t('profile.support')}</SectionTitle>
         <Card>
           <Row
             icon='chatbubbles'
-            label='Send feedback'
+            label={t('profile.sendFeedback')}
             onPress={() => Sentry.showFeedbackWidget()}
           />
         </Card>
@@ -227,7 +229,7 @@ export default function profile() {
           <Card>
             <Row
               icon='log-out'
-              label='Sign out'
+              label={t('profile.signOut')}
               onPress={confirmSignOut}
             />
           </Card>
@@ -235,11 +237,11 @@ export default function profile() {
 
         <View className="mt-[10px]">
           <Card>
-            <Row icon="trash" label="Delete your account" tint={theme.danger} onPress={confirmDelete} />
+            <Row icon="trash" label={t('profile.deleteAccount')} tint={theme.danger} onPress={confirmDelete} />
           </Card>
         </View>
         <Text className="mt-[10px] px-[26px] text-[13px] leading-[18px] text-[#A0A0A8] dark:text-[#7A7A80]">
-          Deleting your account removes your profile and meal history for good.
+          {t('profile.deleteAccountFootnote')}
         </Text>
       </ScrollView>
     </View>

@@ -1,0 +1,22 @@
+{
+  "profile": {
+    "title": "Profile",
+    "memberSince": "Member since",
+    "personalDetails": "Personal Details",
+    "preferences": "Preferences",
+    "language": "Language",
+    "familyPlan": "Upgrade to Family Plan",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "sendFeedback": "Send feedback",
+    "signOut": "Sign out",
+    "deleteAccount": "Delete your account",
+    "deleteAccountFootnote": "Deleting your account removes your profile and meal history for good."
+  },
+  "language": {
+    "title": "Language",
+    "system": "System Default",
+    "english": "English",
+    "indonesian": "Bahasa Indonesia"
+  }
+}

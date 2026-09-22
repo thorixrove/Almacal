@@ -6,7 +6,8 @@ import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { useIsFocused, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React, { use, useEffect, useRef, useState, type ComponentProps } from 'react';
+import React, { useEffect, useRef, useState, type ComponentProps } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Linking, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -30,6 +31,7 @@ export default function camera() {
   const [shot, setShot] = useState<Shot | null>(null)
   const logMeal = useLogMeal()
   const isFocused = useIsFocused()
+  const { t } = useTranslation()
 
 
   const reset = () => {
@@ -73,21 +75,21 @@ export default function camera() {
             <Ionicons name="camera" size={32} color="#FFFFFF" />
           </View>
           <Text className="mt-[22px] text-center text-[22px] font-bold text-white">
-            Camera access
+            {t('camera.cameraAccessTitle')}
           </Text>
           <Text className="mt-[8px] text-center text-[15px] leading-[21px] text-[#9A9AA0]">
-            Almacal AI reads your meals from a photo. Nothing leaves your phone until you take one.
+            {t('camera.cameraAccessDescription')}
           </Text>
           <Pressable
             onPress={() => (permission.canAskAgain ? requestPermission() : Linking.openSettings())}
             className="mt-[24px] h-[52px] items-center justify-center rounded-full bg-white px-[34px] active:opacity-90"
           >
             <Text className="text-[16px] font-semibold text-black">
-              {permission.canAskAgain ? 'Allow camera' : 'Open Settings'}
+              {permission.canAskAgain ? t('camera.allowCamera') : t('camera.openSettings')}
             </Text>
           </Pressable>
           <Pressable onPress={pickFromGallery} className="mt-[16px] p-[8px] active:opacity-70">
-            <Text className="text-[15px] font-medium text-[#9A9AA0]">Choose from gallery</Text>
+            <Text className="text-[15px] font-medium text-[#9A9AA0]">{t('camera.chooseFromGallery')}</Text>
           </Pressable>
         </View>
       </Screen>
@@ -142,7 +144,7 @@ export default function camera() {
                 <>
                   <Ionicons name="sparkles" size={18} color="#000000" />
                   <Text className="ml-[8px] text-[17px] font-semibold text-black">
-                    Analyze the food
+                    {t('camera.analyzeFood')}
                   </Text>
                 </>
               )}
@@ -151,7 +153,7 @@ export default function camera() {
         ) : (
           <View className="items-center">
             <Text className="mb-[18px] text-[15px] text-white/70">
-              Fit the whole plate in frame
+              {t('camera.fitWholePlate')}
             </Text>
             <View className="w-full flex-row items-center justify-center">
               <View className="absolute left-[34px]">{galleryButton}</View>
@@ -172,6 +174,7 @@ export default function camera() {
   function Result({ logged, uri, onDone }: { logged: LoggedMeal; uri: string; onDone: () => void }) {
     const insets = useSafeAreaInsets()
     const router = useRouter()
+    const { t } = useTranslation()
 
     const { run, error } = useRealtimeRun<typeof analyzeMeal>(logged.runId, {
       accessToken: logged.publicAccessToken,
@@ -226,10 +229,10 @@ export default function camera() {
           {failed ? (
             <View className="items-center">
               <Text className="text-[20px] font-bold text-white">
-                {notFood ? "That doesn't look like food" : "We couldn't read that one"}
+                {notFood ? t('camera.notFood') : t('camera.errorMessage')}
               </Text>
               <Text className="mt-[8px] text-center text-[15px] leading-[21px] text-[#9A9AA0]">
-                Try again with the meal centred and well lit.
+                {t('camera.tryAgain')}
               </Text>
             </View>
           ) : output?.status === 'completed' ? (
@@ -237,7 +240,7 @@ export default function camera() {
               <Text className="text-center text-[24px] font-bold text-white">{output.name}</Text>
               <Text className="mt-[2px] text-center text-[44px] font-bold leading-[52px] text-white">
                 {output.calories}
-                <Text className="text-[18px] font-medium text-[#9A9AA0]">kcal</Text>
+                <Text className="text-[18px] font-medium text-[#9A9AA0]">{t('camera.kcal')}</Text>
               </Text>
               <View className="mt-[22px] flex-row gap-[10px]">
                 {MACROS.map((macro) => (
@@ -262,20 +265,20 @@ export default function camera() {
           ) : (
             <View className="items-center">
               <ActivityIndicator color="#FFFFFF" />
-              <Text  className="mt-[14px] text-[17px] font-semibold text-white">
-                Analyzing your meal…
+              <Text className="mt-[14px] text-[17px] font-semibold text-white">
+                {t('camera.analyzingMeal')}
               </Text>
-              <Text className="mt-[6px] text-[15px] text-[#9A9AA0]">This takes a few seconds.</Text>
+              <Text className="mt-[6px] text-[15px] text-[#9A9AA0]">{t('camera.takesFewSeconds')}</Text>
             </View>
           )}
         </View>
 
         <View className="flex-row gap-[12px] px-[22px] pb-[26px]">
           <Pressable
-           onPress={onDone}
-          className="h-[56px] flex-1 items-center justify-center rounded-full bg-[#1E1E23] active:opacity-70"
+            onPress={onDone}
+            className="h-[56px] flex-1 items-center justify-center rounded-full bg-[#1E1E23] active:opacity-70"
           >
-            <Text className="text-[16px] font-semibold text-white">Scan another</Text>
+            <Text className="text-[16px] font-semibold text-white">{t('camera.scanAnother')}</Text>
           </Pressable>
           <Pressable
             onPress={() => {
@@ -284,7 +287,7 @@ export default function camera() {
             }}
             className="h-[56px] flex-1 items-center justify-center rounded-full bg-white active:opacity-90"
           >
-            <Text className="text-[16px] font-semibold text-black">Done</Text>
+            <Text className="text-[16px] font-semibold text-black">{t('camera.done')}</Text>
           </Pressable>
         </View>
       </View>

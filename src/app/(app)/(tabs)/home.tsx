@@ -15,12 +15,14 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Ring } from "@/components/ring";
 import { MealDetailSheet } from "@/components/meal-detail-sheet";
+import { Ring } from "@/components/ring";
 import { StreakSheet } from "@/components/streak-sheet";
 import { MACROS } from "@/constants/macros";
 import { useDeleteMeal, useMeals, useProfile } from "@/lib/api";
+import { proxyImage } from "@/lib/image-proxy";
 import { useThemeColors } from "@/lib/theme";
+import { useTranslation } from "react-i18next";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -35,24 +37,24 @@ const MACRO_VECTOR_ICON: Record<"protein" | "carbs" | "fat", ComponentProps<type
   fat: "flame",
 };
 
-const thumbnail = (url: string, pt: number) => `${url}?tr=w-${pt * 3},h-${pt * 3},q-70`;
+const thumbnail = (url: string, pt: number) => `${proxyImage(url)}?tr=w-${pt * 3},h-${pt * 3},q-70`;
 
 const midnight = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
 
 const isoDate = (d: Date) => 
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
 
-  const mealType = (d: Date) => {
-    const h = d.getHours()
-    return h < 11 ? "Breakfast" : h < 16 ? "Lunch" : h < 21 ? "Dinner" : "Snack"
-  }
-
-
 export default function home() {
   const insets = useSafeAreaInsets()
   const router = useRouter()
   const { colorScheme } = useColorScheme()
   const theme = useThemeColors()
+  const { t } = useTranslation()
+
+  const mealType = (d: Date) => {
+    const h = d.getHours()
+    return h < 11 ? t("home.mealTypes.breakfast") : h < 16 ? t("home.mealTypes.lunch") : h < 21 ? t("home.mealTypes.dinner") : t("home.mealTypes.snack")
+  }
 
   const today = midnight(new Date())
   const [selected, setSelected] = useState(today)
@@ -217,7 +219,7 @@ export default function home() {
               {Math.max(0, plan.calories - eaten.calories).toLocaleString("en-US")}
             </Text>
             <Text className="mt-[2px] text-[16px] leading-[21px] text-[#6E6E78] dark:text-[#9A9AA0]">
-              Calories left
+              {t("home.caloriesLeft")}
             </Text>
           </View>
           <Ring size={96} stroke={10} progress={eaten.calories / plan.calories}>
@@ -237,8 +239,8 @@ export default function home() {
                 <Text className="text-[22px] font-bold leading-[27px] tracking-[-0.4px] text-black dark:text-white">
                   {left}g
                 </Text>
-                <Text className="mt-[1px] text-[11px] leading-[18px] text-[#6E6E78] dark:text-[#9A9AA0]">
-                  {macro.label} left
+                <Text className="mt-[1px] text-[9px] leading-[18px] text-[#6E6E78] dark:text-[#9A9AA0]">
+                  {macro.label} {t("home.macroLeft")}
                 </Text>
                 <View className="mt-[14px] w-full items-center">
                   <Ring
@@ -257,7 +259,7 @@ export default function home() {
 
         <Text className="ml-[22px] mt-[28px] text-[22px] font-bold tracking-[-0.4px] text-black dark:text-white">
           {isToday
-            ? "Today's meals"
+            ? t("home.todayMeals")
             : selectedDate.toLocaleDateString("en-US", {
               weekday: "long",
               month: "short",
@@ -284,10 +286,10 @@ export default function home() {
                     {meal.status === "completed"
                       ? meal.name
                       : meal.status === "analyzing"
-                        ? "Analyzing..."
+                        ? t("home.analyzing")
                         : meal.errorReason === "not_food"
-                          ? "Not food"
-                          : "Couldn't read this one"}
+                          ? t("home.notFood")
+                          : t("home.couldntRead")}
                   </Text>
                   <Text className="mt-[2px] text-[13px] text-[#8A8A90] dark:text-[#9A9AA0]">
                     {meal.loggedAt.toLocaleTimeString("en-US", {
@@ -336,8 +338,8 @@ export default function home() {
             </View>
             <Text className="mt-[14px] text-center text-[15px] leading-[20px] text-[#6E6E78] dark:text-[#9A9AA0]">
               {isToday
-                ? "Snap your first meal of the day and the numbers land here."
-                : "No meals logged on this day."
+                ? t("home.snapFirstMeal")
+                : t("home.noMealsDay")
               }
             </Text>
             {isToday ? (
@@ -346,7 +348,7 @@ export default function home() {
                 className="mt-[16px] h-[44px] flex-row items-center justify-center rounded-full bg-black px-[22px] active:opacity-90"
               >
                 <Ionicons name="camera" size={16} color="#FFFFFF" />
-                <Text className="ml-[8px] text-[15px] font-semibold text-white">Scan a meal</Text>
+                <Text className="ml-[8px] text-[15px] font-semibold text-white">{t("home.scanMeal")}</Text>
               </Pressable>
             ) : null}
           </View>

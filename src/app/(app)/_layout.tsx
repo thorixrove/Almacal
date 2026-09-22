@@ -1,17 +1,40 @@
 import { useAuth } from '@clerk/expo';
-import { MaterialIcons } from '@expo/vector-icons';
-import { Redirect, Tabs } from 'expo-router';
+import { Redirect, Stack } from 'expo-router';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useProfile } from '@/lib/api';
+import { useEffect } from 'react';
+import { colorScheme } from 'nativewind';
+import { ThemePreference } from '@/lib/theme';
 
 export default function AppLayout() {
     const { isLoaded, isSignedIn } = useAuth();
     const { data: profile, isPending, isError, refetch } = useProfile();
 
+    // TEMP DEBUG — hapus setelah gerbang onboarding terbukti jalan
+    console.log('[gate]', JSON.stringify({
+        isLoaded,
+        isSignedIn,
+        isPending,
+        isError,
+        onboardedAt: profile?.onboardingCompletedAt ?? null,
+    }));
+
+    useEffect(() => {
+        if (profile?.themePreference) colorScheme.set(profile.themePreference as ThemePreference)
+    }, [profile?.themePreference])
+
+
+    console.log('[gate]', JSON.stringify({
+        isLoaded,
+        isSignedIn,
+        isPending,
+        isError,
+        onboardedAt: profile?.onboardingCompletedAt ?? null,
+    }))
+
     if (!isLoaded) return null;
-    if (!isSignedIn) return <Redirect href="/" />;
+    if (!isSignedIn) return <Redirect href="/sign-in" />;
     if (isPending) return <Centered />;
 
     if (isError) {
@@ -30,76 +53,16 @@ export default function AppLayout() {
         );
     }
 
+    // Login sudah terjadi di awal; user baru (belum ada profil) diarahkan mengisi biodata.
     if (!profile?.onboardingCompletedAt) {
         return <Redirect href={{ pathname: '/onboarding/[step]', params: { step: 'gender' } }} />;
     }
 
-    return (
-        <Tabs
-            screenOptions={{
-                headerShown: false,
-                lazy: false,
-                animation: 'none',
-                freezeOnBlur: false,
-            }}
-            tabBar={(props) => <CustomTabBar {...props} />}
-        >
-            <Tabs.Screen name="home" options={{ title: 'Home' }} />
-            <Tabs.Screen name="camera" options={{ title: 'Scan' }} />
-            <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
-        </Tabs>
-    );
-}
-
-const ICONS: Record<string, keyof typeof MaterialIcons.glyphMap> = {
-    home: 'home',
-    camera: 'photo-camera',
-    profile: 'person',
-};
-
-function CustomTabBar({ state, navigation }: any) {
-    const insets = useSafeAreaInsets();
-
-    return (
-        <View
-            style={{ bottom: insets.bottom + 12 }}
-            className="absolute left-[40px] right-[40px] flex-row items-center justify-between rounded-[50px] bg-white px-[15px] py-[5px] shadow-lg"
-        >
-            {state.routes.map((route: any, index: number) => {
-                const focused = state.index === index;
-                const label = route.name.charAt(0).toUpperCase() + route.name.slice(1);
-
-                const onPress = () => {
-                    if (focused) return;
-                    navigation.navigate(route.name);
-                    navigation.emit({ type: 'tabPress', target: route.key });
-                };
-
-                return (
-                    <Pressable
-                        key={route.key}
-                        onPress={onPress}
-                        className={`flex-1 items-center justify-center rounded-[50px] py-[10px] ${
-                            focused ? 'bg-[#c0c0c0]' : ''
-                        }`}
-                    >
-                        <MaterialIcons
-                            name={ICONS[route.name]}
-                            size={25}
-                            color={focused ? '#FFFFFF' : '#9A9AA0'}
-                        />
-                        <Text
-                            className={`mt-[2px] text-[10px] ${
-                                focused ? 'font-semibold text-white' : 'text-[#9A9AA0]'
-                            }`}
-                        >
-                            {label}
-                        </Text>
-                    </Pressable>
-                );
-            })}
-        </View>
-    );
+    // Expo Router auto-discovers every route under this folder — (tabs) as the
+    // tab-bar group, personal-details/index and personal-details/[field] as
+    // ordinary pushed screens on top of it. No need to list them by hand unless
+    // a screen needs custom options (e.g. presentation: 'modal').
+    return <Stack screenOptions={{ headerShown: false }} />;
 }
 
 function Centered({ children }: { children?: React.ReactNode }) {

@@ -4,51 +4,60 @@ import * as Linking from 'expo-linking';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SymbolView } from 'expo-symbols';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useSaveProfile } from '@/lib/api';
-import { draft } from '@/onboarding/steps';
-
 type Provider = 'oauth_apple' | 'oauth_google';
+
+// router.replace('/home') sebelumnya terpanggil 2-5x per login. Flag di level modul ini
+// memastikan navigasi cuma sekali sampai user sign out.
+let navigated = false;
 
 export default function SignIn() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { startSSOFlow } = useSSO();
   const { isSignedIn } = useAuth();
-  const save = useSaveProfile();
   const [busy, setBusy] = useState<Provider | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // only show the plan chip to someone who just finished the questionnaire
-  const plan = draft.plan;
-
-  /** A plan generated before sign-up is persisted the moment there's an account. */
-  const finish = async () => {
-    if (draft.plan) await save.mutateAsync();
-    router.replace('/home');
-  };
+  // Pindah hanya setelah Clerk benar-benar melaporkan isSignedIn=true (bukan tepat setelah
+  // setActive), supaya layout tujuan tidak membaca isSignedIn yang masih basi.
+  // Tujuannya /home: (app)/_layout yang memutuskan — profil belum ada → onboarding,
+  // sudah ada → tab.
+  useEffect(() => {
+    if (isSignedIn) {
+      if (!navigated) {
+        navigated = true;
+        router.replace('/home');
+      }
+    } else {
+      navigated = false; // sudah sign out — izinkan login berikutnya
+    }
+  }, [isSignedIn, router]);
 
   const signInWith = async (strategy: Provider) => {
     if (busy) return;
     setBusy(strategy);
     setError(null);
+    let keepBusy = false;
     try {
-      // already signed in means the save failed last time — retry just that
+      // sudah login tapi masih di layar ini: navigasi sebelumnya gagal, ulangi
       if (isSignedIn) {
-        await finish();
+        router.replace('/home');
         return;
       }
 
       const { createdSessionId, setActive, signUp } = await startSSOFlow({
         strategy,
-        redirectUrl: Linking.createURL('/', { scheme: 'almacal' }),
+        redirectUrl: Linking.createURL('/auth-callback', { scheme: 'almacal' }),
       });
       if (createdSessionId && setActive) {
         await setActive({ session: createdSessionId });
-        await finish();
+        // jangan pindah di sini — effect di atas yang menangani begitu isSignedIn true.
+        // Spinner dibiarkan menyala sampai layar ini ditutup.
+        keepBusy = true;
         return;
       }
       if (signUp?.status === 'missing_requirements') {
@@ -59,7 +68,7 @@ export default function SignIn() {
       setError('Something went wrong. Please try again.');
       console.error('SSO error:', JSON.stringify(err, null, 2));
     } finally {
-      setBusy(null);
+      if (!keepBusy) setBusy(null);
     }
   };
 
@@ -77,28 +86,16 @@ export default function SignIn() {
 
       <View className="flex-1 items-center justify-center px-[26px]">
         <Image
-          source={require('@/assets/images/logo-mark.png')}
+          source={require('@/assets/images/almacal.png')}
           style={{ width: 62, height: 72 }}
           contentFit="contain"
         />
         <Text className="mt-[26px] text-center text-[32px] font-bold leading-[38px] text-black">
-          Save your plan
+          Welcome to AlmaCal
         </Text>
         <Text className="mt-[8px] w-[290px] text-center text-[17px] leading-[23px] text-[#4A4A52]">
-          Sign in to keep your targets, streak and meal history on every device.
+          Sign in to build your personal calorie plan and keep your progress on every device.
         </Text>
-
-        {plan ? (
-          <View className="mt-[26px] flex-row items-center rounded-full border border-[#EDEDEF] bg-white px-[18px] py-[10px]">
-            <SymbolView name="checkmark.circle.fill" size={17} tintColor="#000000" />
-            <Text className="ml-[8px] text-[15px] leading-[20px] text-[#4A4A52]">
-              Your plan is ready —{' '}
-              <Text className="font-semibold text-black">
-                {plan.calories.toLocaleString('en-US')} cal / day
-              </Text>
-            </Text>
-          </View>
-        ) : null}
       </View>
 
       <View className="px-[26px]">

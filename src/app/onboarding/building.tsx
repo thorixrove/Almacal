@@ -56,7 +56,7 @@ export default function BuildingPlan() {
     return (
         <View className="flex-1 items-center justify-center bg-[#FEFDFD] px-[40px]">
             <StatusBar style="dark" />
-            <Image source={require('@/assets/images/logo-mark.png')}
+            <Image source={require('@/assets/images/almacal.png')}
                 style={{ width: 84, height: 96 }}
                 contentFit="contain"
             />

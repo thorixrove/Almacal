@@ -5,6 +5,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { isRunningInExpoGo } from "expo";
 import { Stack, useNavigationContainerRef } from "expo-router";
 import { useEffect, useState } from "react";
+import { LogBox } from "react-native";
+import { colorScheme } from "nativewind";
+
+import { loadThemePreference } from "@/lib/theme";
+import { loadLanguagePreference, applyLanguage } from "@/lib/language";
+import "@/lib/i18n";
 
 import "@/global.css";
 
@@ -25,22 +31,29 @@ const navigationIntegration = Sentry.reactNavigationIntegration({
   enableTimeToInitialDisplay: !isRunningInExpoGo(),
 });
 
+// safety net: hide the two harmless native Sentry messages on Android
+LogBox.ignoreLogs([
+  "[Native] [Sentry] addListener of NativeEventEmitter",
+  "[Native] [Sentry] Failed to delete",
+]);
+
 Sentry.init({
   dsn: "https://f3be6c9687561e6cb48e1aad78153ba2@o4511578221182976.ingest.us.sentry.io/4512079896641536",
   // The SDK would default this to "development" on a dev build, which the dashboard's
   // environment filter hides unless you switch it. Explicit so it's visible in the UI.
   environment: __DEV__ ? "development" : "production",
-  // Disable noisy native log capture on dev builds; this can trigger filesystem errors on
-  // some Android/dev-client setups and is not needed for the app's crash reporting.
+  // Off by default: on Android it forwards native SDK logs to the console as red
+  // "[Native] [Sentry] ..." errors that are harmless noise. Flip to __DEV__ only when you
+  // need to check whether an envelope was actually sent.
   debug: false,
   sendDefaultPii: true,
-  enableLogs: false,
+  enableLogs: true,
   // ponytail: sample everything while the app is small; drop to ~0.1 once traffic costs quota
   tracesSampleRate: 1.0,
   profilesSampleRate: 1.0,
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
-  enableNativeFramesTracking: false,
+  enableNativeFramesTracking: !isRunningInExpoGo(),
   integrations: [
     Sentry.mobileReplayIntegration({
       maskAllImages: false,
@@ -66,11 +79,30 @@ function RootLayout() {
   return (
     <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
       <QueryClientProvider client={queryClient}>
+        <ThemeGate />
+        <LanguageGate />
         <SentryUser />
         <Stack screenOptions={{ headerShown: false }} />
       </QueryClientProvider>
     </ClerkProvider>
   );
+}
+
+
+function ThemeGate() {
+  useEffect(() => {
+    loadThemePreference().then((preference) => colorScheme.set(preference))
+  }, [])
+
+  return null
+}
+
+function LanguageGate() {
+  useEffect(() => {
+    loadLanguagePreference().then(applyLanguage)
+  }, [])
+
+  return null
 }
 
 /**

@@ -6,7 +6,7 @@ import { z } from 'zod';
 // Relative, not "@/" — these tasks are bundled by Trigger.dev, not Metro.
 import { db, meals } from '../db';
 
-const MODEL = 'qwen/qwen3.6-27b'; // model vision Groq yang aktif (per Sept 2026)
+const MODEL = 'qwen/qwen3.8-27b'; // model vision Groq yang aktif di akun ini (per Sept 2026)
 
 /**
  * ImageKit resize applied only for the model's copy of the photo — the row keeps the
@@ -62,6 +62,10 @@ export const analyzeMeal = schemaTask({
     const response = await groq.chat.completions.create({
       model: MODEL,
       response_format: { type: 'json_object' },
+      // The response is a tiny fixed-shape JSON object — capped well under Groq's
+      // on_demand OTPM limit (1000/min) to avoid 429s. Raise if the model starts
+      // truncating valid JSON, but this schema shouldn't need more than ~150 tokens.
+      max_tokens: 300,
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         {

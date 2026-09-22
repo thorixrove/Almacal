@@ -2,6 +2,7 @@ import { Ionicons } from '@react-native-vector-icons/ionicons/static';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SymbolView, type SFSymbol } from 'expo-symbols';
+import { useColorScheme } from 'nativewind';
 import type { ComponentProps, ReactNode } from 'react';
 import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
@@ -31,6 +32,9 @@ export function OnboardingScreen({
     const insets = useSafeAreaInsets()
     const router = useRouter()
     const filled = 1 + Math.floor(progress * (SEGMENTS - 1))
+    // Langkah pertama (setelah gerbang mengarahkan user baru ke sini) tidak punya layar
+    // sebelumnya — tombol kembali di situ memicu error "GO_BACK was not handled".
+    const canGoBack = router.canGoBack()
 
     return (
         <View
@@ -39,9 +43,13 @@ export function OnboardingScreen({
             <StatusBar style="dark" />
 
             <View className="mt-[4px] h-[24px] flex-row items-center px-[26px]">
-                <Pressable onPress={() => router.back()} hitSlop={12}>
-                    <Ionicons name="arrow-back" size={22} color="#000000" />
-                </Pressable>
+                {canGoBack ? (
+                    <Pressable onPress={() => router.back()} hitSlop={12}>
+                        <Ionicons name="arrow-back" size={22} color="#000000" />
+                    </Pressable>
+                ) : (
+                    <View style={{ width: 22, height: 22 }} />
+                )}
                 <View className="ml-[26px] flex-row gap-[10px]">
                     {Array.from({ length: SEGMENTS }, (_, i) => (
                         <View
@@ -105,36 +113,40 @@ export function OptionCard({
     tall?: boolean;
     onPress: () => void;
 }) {
+    const { colorScheme } = useColorScheme()
+    const isDark = colorScheme === 'dark'
+    const iconTint = isDark ? '#FFFFFF' : '#000000'
+
     return (
         <Pressable
             onPress={onPress}
-            className={`flex-row items-center rounded-[18px] px-[18px] py-[16px] ${selected ? 'border-[2px] border-black bg-white' : 'border border-[#EDEDEF] bg-[#F5F5F6]'}`}
+            className={`flex-row items-center rounded-[18px] px-[18px] py-[16px] ${selected ? 'border-[2px] border-black bg-white dark:border-white dark:bg-[#1C1C1E]' : 'border border-[#EDEDEF] bg-[#F5F5F6] dark:border-[#2C2C2E] dark:bg-[#1C1C1E]'}`}
             style={{
                 minHeight: tall ? 96 : 72,
             }}
         >
             <View className={`items-center justify-center ${tall ? 'h-[52px] w-[52px]' : 'h-[42px] w-[42px]'}`}>
                 {vectorIcon ? (
-                    <Ionicons name={vectorIcon} size={tall ? 28 : 24} color="#000000" />
+                    <Ionicons name={vectorIcon} size={tall ? 28 : 24} color={iconTint} />
                 ) : glyph ? (
                     <Text style={{ fontSize: 24, lineHeight: 28, includeFontPadding: false }}>
                         {glyph}
                     </Text>
                 ) : icon ? (
-                    <SymbolView name={icon} size={tall ? 28 : 24} weight="regular" tintColor="#000000" />
+                    <SymbolView name={icon} size={tall ? 28 : 24} weight="regular" tintColor={iconTint} />
                 ) : null}
             </View>
             <View className="ml-[14px] flex-1">
-                <Text className="text-[17px] font-semibold leading-[22px] text-black">{title}</Text>
+                <Text className="text-[17px] font-semibold leading-[22px] text-black dark:text-white">{title}</Text>
                 {subtitle ? (
-                    <Text className="mt-[2px] text-[14px] leading-[19px] text-[#6E6E78]">{subtitle}</Text>
+                    <Text className="mt-[2px] text-[14px] leading-[19px] text-[#6E6E78] dark:text-[#9A9AA0]">{subtitle}</Text>
                 ) : null}
             </View>
             <View
-                className={`h-[22px] w-[22px] items-center justify-center rounded-full ${selected ? 'bg-black' : 'border border-[#C8C8CC] bg-white'}`}
+                className={`h-[22px] w-[22px] items-center justify-center rounded-full ${selected ? 'bg-black dark:bg-white' : 'border border-[#C8C8CC] bg-white dark:border-[#3A3A3C] dark:bg-[#1C1C1E]'}`}
             >
                 {selected ? (
-                    <Ionicons name="checkmark" size={11} color="#FFFFFF" />
+                    <Ionicons name="checkmark" size={11} color={isDark ? '#000000' : '#FFFFFF'} />
                 ) : null}
             </View>
         </Pressable>
@@ -167,6 +179,8 @@ export function RulerPicker({
     labelDecimals?: number;
 }) {
     const [trackWidth, setTrackWidth] = useState(0)
+    const { colorScheme } = useColorScheme()
+    const isDark = colorScheme === 'dark'
     const safeRange = Math.max(max - min, increment)
     const percent = Math.min(100, Math.max(0, ((value - min) / safeRange) * 100))
 
@@ -188,10 +202,10 @@ export function RulerPicker({
     return (
         <View className="items-center justify-center">
             <View className="flex-row items-end justify-center">
-                <Text className="text-[44px] font-bold leading-[48px] text-black">
+                <Text className="text-[44px] font-bold leading-[48px] text-black dark:text-white">
                     {value.toFixed(decimals)}
                 </Text>
-                <Text className="mb-[10px] ml-[12px] text-[18px] leading-[20px] text-[#6E6E78]">
+                <Text className="mb-[10px] ml-[12px] text-[18px] leading-[20px] text-[#6E6E78] dark:text-[#9A9AA0]">
                     {unit}
                 </Text>
             </View>
@@ -205,16 +219,20 @@ export function RulerPicker({
                     onResponderGrant={(e) => updateFromTouch(e.nativeEvent.locationX)}
                     onResponderMove={(e) => updateFromTouch(e.nativeEvent.locationX)}
                 >
-                    <View className="absolute left-0 right-0 top-[15px] h-[2px] bg-[#D9D9DA]" />
                     <View
-                        className="absolute top-[15px] h-[2px] bg-black"
-                        style={{ left: 0, width: `${percent}%` }}
+                        className="absolute left-0 right-0 top-[15px] h-[2px]"
+                        style={{ backgroundColor: isDark ? '#3A3A3C' : '#D9D9DA' }}
                     />
                     <View
-                        className="absolute top-[6px] h-[20px] w-[20px] rounded-full bg-black"
+                        className="absolute top-[15px] h-[2px]"
+                        style={{ left: 0, width: `${percent}%`, backgroundColor: isDark ? '#FFFFFF' : '#000000' }}
+                    />
+                    <View
+                        className="absolute top-[6px] h-[20px] w-[20px] rounded-full"
                         style={{
                             left: `${percent}%`,
                             transform: [{ translateX: -10 }],
+                            backgroundColor: isDark ? '#FFFFFF' : '#000000',
                         }}
                     />
                 </View>

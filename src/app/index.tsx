@@ -22,7 +22,7 @@ export default function WelcomeScreen() {
 
       <View className="mt-[22px] flex-row items-center justify-center gap-[10px]">
         <Image
-          source={require("@/assets/images/logo-mark.png")}
+          source={require("@/assets/images/almacal.png")}
           style={{ width: 41, height: 47, marginBottom: 8 }}
           contentFit="contain"
         />
@@ -43,9 +43,7 @@ export default function WelcomeScreen() {
         </Text>
 
         <Pressable
-          onPress={() =>
-            router.push({ pathname: "/onboarding/[step]", params: { step: "gender" } })
-          }
+          onPress={() => router.push("/sign-in")}
           className="mt-[17px] h-[48px] w-full flex-row items-center justify-center rounded-full bg-black active:opacity-90"
         >
           <Text className="text-[16px] font-bold tracking-[-0.4px] text-white">Get Started</Text>
@@ -60,12 +58,6 @@ export default function WelcomeScreen() {
             }}
           >
             →
-          </Text>
-        </Pressable>
-
-        <Pressable onPress={() => router.push("/sign-in")} hitSlop={12}>
-          <Text className="mt-[13px] text-center text-[15px] tracking-[-0.5px] text-[#262626]">
-            Already have an account? <Text className="font-bold text-black">Sign In</Text>
           </Text>
         </Pressable>
       </View>

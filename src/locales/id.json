@@ -1,0 +1,22 @@
+{
+  "profile": {
+    "title": "Profil",
+    "memberSince": "Anggota sejak",
+    "personalDetails": "Detail Pribadi",
+    "preferences": "Preferensi",
+    "language": "Bahasa",
+    "familyPlan": "Upgrade ke Family Plan",
+    "privacyPolicy": "Kebijakan Privasi",
+    "termsOfService": "Ketentuan Layanan",
+    "sendFeedback": "Kirim masukan",
+    "signOut": "Keluar",
+    "deleteAccount": "Hapus akun Anda",
+    "deleteAccountFootnote": "Menghapus akun akan menghilangkan profil dan riwayat makanan Anda secara permanen."
+  },
+  "language": {
+    "title": "Bahasa",
+    "system": "Sesuai Perangkat",
+    "english": "English",
+    "indonesian": "Bahasa Indonesia"
+  }
+}

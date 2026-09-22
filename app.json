@@ -4,7 +4,7 @@
     "slug": "almacal",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/almacal.png",
     "scheme": "almacal",
     "userInterfaceStyle": "automatic",
     "ios": {
@@ -13,16 +13,14 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "monochromeImage": "./assets/images/almacal.png"
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.thorixrover.almacal"
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/almacal.png"
     },
     "plugins": [
       "expo-router",
@@ -30,7 +28,7 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#208AEF",
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/almacal.png",
           "imageWidth": 76
         }
       ],
@@ -46,7 +44,8 @@
           "organization": "alamanatra"
         }
       ],
-      "@react-native-vector-icons/ionicons"
+      "@react-native-vector-icons/ionicons",
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true,

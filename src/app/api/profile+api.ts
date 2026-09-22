@@ -1,8 +1,8 @@
 import { createClerkClient } from "@clerk/backend";
-import { eq } from "drizzle-orm";
+import { eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 
-import { db, users } from "@/db";
+import { db, languagePreferenceEnum, users } from "@/db";
 import { deleteUserImages } from "@/lib/imagekit";
 import { planInputSchema } from "@/lib/plan";
 import { getAuthUserId, unauthorized } from "@/lib/server-auth";
@@ -18,6 +18,8 @@ const PROFILE_COLUMNS = {
   activityLevel: users.activityLevel,
   paceKgPerWeek: users.paceKgPerWeek,
   dietPreference: users.dietPreference,
+  unitPreference: users.unitPreference,
+  themePreference: users.themePreference,
   timezone: users.timezone,
   dailyCalories: users.dailyCalories,
   proteinG: users.proteinG,
@@ -27,6 +29,7 @@ const PROFILE_COLUMNS = {
   planGeneratedAt: users.planGeneratedAt,
   onboardingCompletedAt: users.onboardingCompletedAt,
   createdAt: users.createdAt,
+  languagePreference: users.languagePreference,
 };
 
 const saveProfileSchema = planInputSchema.extend({
@@ -38,6 +41,13 @@ const saveProfileSchema = planInputSchema.extend({
     fat: z.number().int().min(0),
     rationale: z.string().max(500),
   }),
+});
+
+
+const updateProfileSchema = planInputSchema.partial().extend({
+  unitPreference: z.enum(["metric", "imperial"]).optional(),
+  themePreference: z.enum(["light", "dark", "system"]).optional(),
+  languagePreference: z.enum(["en", "id", "system"]).optional(),
 });
 
 /** Profile + targets, or `null` for a user who hasn't finished onboarding. */
@@ -59,6 +69,11 @@ export async function GET(request: Request) {
  * Upsert, never a plain insert: the Clerk webhook may or may not have created the
  * row yet, and either order has to produce exactly one row (PLAN.md "Race
  * condition, handled"). `email` is left alone here — the webhook owns it.
+ *
+ * First save wins: once a row has `onboardingCompletedAt`, this never overwrites it.
+ * A returning user who redoes the questionnaire before signing in keeps their
+ * existing profile (they change targets via PATCH). The guard is part of the upsert
+ * itself (`setWhere`), so it stays correct even with two requests racing.
  */
 export async function POST(request: Request) {
   const clerkUserId = await getAuthUserId(request);
@@ -85,14 +100,22 @@ export async function POST(request: Request) {
     onboardingCompletedAt: now,
   };
 
-  const [profile] = await db
+  const [saved] = await db
     .insert(users)
     .values({ clerkUserId, ...columns })
     .onConflictDoUpdate({
       target: users.clerkUserId,
       set: { ...columns, updatedAt: now }, // $onUpdate doesn't fire on conflict-update
+      // only fill in a row that hasn't finished onboarding yet (e.g. created by the webhook)
+      setWhere: isNull(users.onboardingCompletedAt),
     })
     .returning(PROFILE_COLUMNS);
+
+  // RETURNING is empty when setWhere skipped the update: the profile already existed,
+  // so hand back the stored one instead of the draft the client just sent.
+  const [profile] = saved
+    ? [saved]
+    : await db.select(PROFILE_COLUMNS).from(users).where(eq(users.clerkUserId, clerkUserId));
 
   return Response.json(profile);
 }
@@ -115,6 +138,37 @@ export async function POST(request: Request) {
  * Nothing is swallowed. A half-finished delete answers 500 and the client retries;
  * each step is idempotent, so the retry finishes whatever is left.
  */
+
+
+export async function PATCH(request: Request) {
+  const clerkUserId = await getAuthUserId(request)
+  if (!clerkUserId) return unauthorized()
+
+  const parsed = updateProfileSchema.safeParse(await request.json().catch(() => null))
+  if (!parsed.success) {
+    return Response.json(
+      { error: "Invalid profile", issues: parsed.error.issues },
+      { status: 400 },
+    )
+  }
+
+  if (Object.keys(parsed.data).length === 0) {
+    return Response.json({ error: "No fields to update" }, { status: 400 })
+  }
+
+  const [profile] = await db
+    .update(users)
+    .set({ ...parsed.data, updatedAt: new Date() })
+    .where(eq(users.clerkUserId, clerkUserId))
+    .returning(PROFILE_COLUMNS)
+
+  if (!profile) {
+    return Response.json({ error: "Finish onboarding first" }, { status: 404 })
+  }
+
+  return Response.json(profile)
+}
+
 export async function DELETE(request: Request) {
   const clerkUserId = await getAuthUserId(request);
   if (!clerkUserId) return unauthorized();

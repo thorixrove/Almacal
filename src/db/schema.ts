@@ -3,11 +3,13 @@ import { date, index, integer, numeric, pgEnum, pgTable, text, timestamp, uuid }
 // Storage is metric + UTC. Conversion happens at the display edge only.
 
 export const unitPreferenceEnum = pgEnum("unit_preference", ["metric", "imperial"]);
+export const themePreferenceEnum = pgEnum("theme_preference", ["light", "dark", "system"]);
 export const goalEnum = pgEnum("goal", ["lose", "maintain", "gain"]);
 // "extra" exists because the onboarding questionnaire offers it — see src/onboarding/steps.ts.
 export const activityLevelEnum = pgEnum("activity_level", ["sedentary", "light", "moderate", "very", "extra"]);
 export const dietPreferenceEnum = pgEnum("diet_preference", ["classic", "keto", "vegan", "vegetarian"]);
 export const mealStatusEnum = pgEnum("meal_status", ["analyzing", "completed", "failed"]);
+export const languagePreferenceEnum = pgEnum("language_preference", ["en", "id", "system"]);
 
 const timestamps = {
   createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
@@ -23,6 +25,8 @@ export const users = pgTable("users", {
   email: text(),
   timezone: text(), // IANA, e.g. "America/New_York"
   unitPreference: unitPreferenceEnum(), // display only
+  themePreference: themePreferenceEnum(), // display only, like unitPreference
+  languagePreference: languagePreferenceEnum(),
 
   gender: text(),
   dateOfBirth: date({ mode: "string" }), // string, not Date — a DOB has no timezone

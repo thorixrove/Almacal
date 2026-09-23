@@ -3,11 +3,12 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { colorScheme, useColorScheme } from 'nativewind';
 import { type ReactNode, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { type Profile, useProfile, useUpdateProfile } from '@/lib/api';
-import { useThemeColors, type ThemePreference } from '@/lib/theme';
+import { type ThemePreference, useThemeColors } from '@/lib/theme';
 
 function Card({ children }: { children: ReactNode }) {
   return (
@@ -58,22 +59,23 @@ function SelectRow({
   );
 }
 
-const UNIT_OPTIONS: { value: NonNullable<Profile['unitPreference']>; title: string; subtitle: string }[] = [
-  { value: 'metric', title: 'Metric', subtitle: 'Kilograms, centimeters' },
-  { value: 'imperial', title: 'Imperial', subtitle: 'Pounds, feet & inches' },
-];
-
-const THEME_OPTIONS: { value: ThemePreference; title: string; subtitle: string }[] = [
-  { value: 'system', title: 'System', subtitle: 'Match your device setting' },
-  { value: 'light', title: 'Light', subtitle: 'Always use light mode' },
-  { value: 'dark', title: 'Dark', subtitle: 'Always use dark mode' },
-];
-
 export default function Preferences() {
   const insets = useSafeAreaInsets();
   const { data: profile, isLoading } = useProfile();
   const update = useUpdateProfile();
   const theme = useThemeColors();
+  const { t } = useTranslation();
+
+  const UNIT_OPTIONS: { value: NonNullable<Profile['unitPreference']>; title: string; subtitle: string }[] = [
+    { value: 'metric', title: t('preferences.metric'), subtitle: t('preferences.metricDesc') },
+    { value: 'imperial', title: t('preferences.imperial'), subtitle: t('preferences.imperialDesc') },
+  ];
+
+  const THEME_OPTIONS: { value: ThemePreference; title: string; subtitle: string }[] = [
+    { value: 'system', title: t('preferences.system'), subtitle: t('preferences.systemDesc') },
+    { value: 'light', title: t('preferences.light'), subtitle: t('preferences.lightDesc') },
+    { value: 'dark', title: t('preferences.dark'), subtitle: t('preferences.darkDesc') },
+  ];
   // Resolved scheme (never 'system') — StatusBar needs the actual light/dark, not the preference.
   const { colorScheme: resolvedScheme } = useColorScheme();
 
@@ -102,11 +104,11 @@ export default function Preferences() {
           <Ionicons name="chevron-back" size={26} color={theme.icon} />
         </Pressable>
         <Text className="ml-[2px] text-[17px] font-semibold text-black dark:text-white">
-          Preferences
+          {t('preferences.title')}
         </Text>
       </View>
 
-      <SectionTitle>Theme</SectionTitle>
+      <SectionTitle>{t('preferences.theme')}</SectionTitle>
       <Card>
         {THEME_OPTIONS.map((option, i) => (
           <SelectRow
@@ -127,7 +129,7 @@ export default function Preferences() {
         </View>
       ) : (
         <>
-          <SectionTitle>Units</SectionTitle>
+          <SectionTitle>{t('preferences.units')}</SectionTitle>
           <Card>
             {UNIT_OPTIONS.map((option, i) => (
               <SelectRow
@@ -145,7 +147,7 @@ export default function Preferences() {
 
           {update.isError ? (
             <Text className="mx-[26px] mt-[10px] text-[14px] text-[#C4453C] dark:text-[#FF6961]">
-              Couldn&apos;t save. Please try again.
+              {t('preferences.saveError')}
             </Text>
           ) : null}
         </>

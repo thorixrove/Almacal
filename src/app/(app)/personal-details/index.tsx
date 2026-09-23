@@ -6,6 +6,8 @@ import { type ComponentProps, type ReactNode } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useTranslation } from 'react-i18next';
+
 import { useProfile, type Profile } from '@/lib/api';
 import { useThemeColors } from '@/lib/theme';
 
@@ -69,47 +71,53 @@ const formatDate = (s?: string | null) =>
  * (`personal-details/[field].tsx`) looks the step up by this same key, so the
  * two files stay in sync automatically if the questionnaire changes.
  */
-const FIELDS: { key: string; icon: IconName; label: string; format: (p: Profile) => string }[] = [
-  { key: 'gender', icon: 'male-female', label: 'Gender', format: (p) => capitalize(p.gender) },
-  { key: 'birthday', icon: 'calendar', label: 'Birthday', format: (p) => formatDate(p.dateOfBirth) },
+const FIELDS: { key: string; icon: IconName; labelKey: string; format: (p: Profile) => string }[] = [
+  { key: 'gender', icon: 'male-female', labelKey: 'personalDetails.gender', format: (p) => capitalize(p.gender) },
+  { key: 'birthday', icon: 'calendar', labelKey: 'personalDetails.birthday', format: (p) => formatDate(p.dateOfBirth) },
   {
     key: 'height',
     icon: 'resize',
-    label: 'Height',
+    labelKey: 'personalDetails.height',
     format: (p) => (p.heightCm ? `${p.heightCm} cm` : '—'),
   },
   {
     key: 'weight',
     icon: 'barbell',
-    label: 'Weight',
+    labelKey: 'personalDetails.weight',
     format: (p) => (p.weightKg ? `${p.weightKg} kg` : '—'),
   },
-  { key: 'goal', icon: 'flag', label: 'Goal', format: (p) => capitalize(p.goal) },
+  { key: 'goal', icon: 'flag', labelKey: 'personalDetails.goal', format: (p) => capitalize(p.goal) },
   {
     key: 'target-weight',
     icon: 'trophy',
-    label: 'Target weight',
+    labelKey: 'personalDetails.targetWeight',
     format: (p) => (p.targetWeightKg ? `${p.targetWeightKg} kg` : '—'),
   },
   {
     key: 'activity',
     icon: 'flash',
-    label: 'Activity level',
+    labelKey: 'personalDetails.activityLevel',
     format: (p) => capitalize(p.activityLevel),
   },
   {
     key: 'pace',
     icon: 'speedometer',
-    label: 'Pace',
+    labelKey: 'personalDetails.pace',
     format: (p) => (p.paceKgPerWeek ? `${p.paceKgPerWeek} kg/week` : '—'),
   },
-  { key: 'diet', icon: 'nutrition', label: 'Diet preference', format: (p) => capitalize(p.dietPreference) },
+  {
+    key: 'diet',
+    icon: 'nutrition',
+    labelKey: 'personalDetails.dietPreference',
+    format: (p) => capitalize(p.dietPreference),
+  },
 ];
 
 export default function PersonalDetails() {
   const insets = useSafeAreaInsets();
   const { data: profile, isLoading } = useProfile();
   const theme = useThemeColors();
+  const { t } = useTranslation();
   const { colorScheme: resolvedScheme } = useColorScheme();
 
   return (
@@ -121,7 +129,7 @@ export default function PersonalDetails() {
           <Ionicons name="chevron-back" size={26} color={theme.icon} />
         </Pressable>
         <Text className="ml-[2px] text-[17px] font-semibold text-black dark:text-white">
-          Personal Details
+          {t('personalDetails.title')}
         </Text>
       </View>
 
@@ -138,7 +146,7 @@ export default function PersonalDetails() {
               <Row
                 key={f.key}
                 icon={f.icon}
-                label={f.label}
+                label={t(f.labelKey)}
                 value={f.format(profile)}
                 divider={i > 0}
                 onPress={() =>

@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Ring } from '@/components/ring';
 import { MACROS } from '@/constants/macros';
+import { proxyImage } from "@/lib/image-proxy";
 
 // SFSymbol names from MACROS are iOS-only; map by key to a cross-platform Ionicons name.
 const MACRO_VECTOR_ICON: Record<'protein' | 'carbs' | 'fat', ComponentProps<typeof Ionicons>['name']> = {
@@ -25,7 +26,7 @@ const MACRO_VECTOR_ICON: Record<'protein' | 'carbs' | 'fat', ComponentProps<type
     fat: 'flame',
 };
 
-const thumbnail = (url: string, pt: number) => `${url}?tr=w-${pt * 3},h-${pt * 3},q-70`;
+const thumbnail = (url: string, pt: number) => `${proxyImage(url)}?tr=w-${pt * 3},h-${pt * 3},q-70`;
 
 const mealType = (d: Date) => {
     const h = d.getHours();

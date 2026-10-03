@@ -29,6 +29,7 @@ export default function TabsLayout() {
         >
             <Tabs.Screen name="home" options={{ title: 'Home' }} />
             <Tabs.Screen name="camera" options={{ title: 'Scan' }} />
+            <Tabs.Screen name="progress" options={{ title: 'Progress' }} />
             <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
         </Tabs>
     );
@@ -37,6 +38,7 @@ export default function TabsLayout() {
 const ICONS: Record<string, keyof typeof MaterialIcons.glyphMap> = {
     home: 'home',
     camera: 'photo-camera',
+    progress: 'bar-chart',
     profile: 'person',
 };
 

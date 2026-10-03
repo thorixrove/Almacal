@@ -13879,7 +13879,7 @@ var require_util2 = __commonJS({
     var stringStartWith = new String().startsWith;
     var mathMin = Math.min;
     function isFunction(functionToCheck) {
-      let getType3 = {};
+      const getType3 = {};
       return functionToCheck && getType3.toString.call(functionToCheck) === "[object Function]";
     }
     __name(isFunction, "isFunction");
@@ -13887,7 +13887,7 @@ var require_util2 = __commonJS({
       const uniques = [];
       const stringify2 = {};
       for (let i2 = 0; i2 < obj.length; i2++) {
-        let keys = Object.keys(obj[i2]);
+        const keys = Object.keys(obj[i2]);
         keys.sort((a2, b2) => {
           return a2 - b2;
         });
@@ -13986,7 +13986,7 @@ var require_util2 = __commonJS({
           parts[1] += parts[2];
         }
         const p1 = (parts[1] || "").toLowerCase();
-        let isPM = p1.indexOf("pm") > -1 || p1.indexOf("p.m.") > -1 || p1.indexOf("p. m.") > -1 || p1.indexOf("n") > -1 || p1.indexOf("ch") > -1 || p1.indexOf("ös") > -1 || pmDesignator && p1.indexOf(pmDesignator) > -1;
+        const isPM = p1.indexOf("pm") > -1 || p1.indexOf("p.m.") > -1 || p1.indexOf("p. m.") > -1 || p1.indexOf("n") > -1 || p1.indexOf("ch") > -1 || p1.indexOf("ös") > -1 || pmDesignator && p1.indexOf(pmDesignator) > -1;
         hour = parseInt(parts[0], 10);
         min = parseInt(parts[1], 10);
         hour = isPM && hour < 12 ? hour + 12 : hour;
@@ -14415,7 +14415,7 @@ var require_util2 = __commonJS({
         callback = opts;
         opts = execOptsWin;
       }
-      let newCmd = "chcp 65001 > nul && cmd /C " + cmd + " && chcp " + codepage + " > nul";
+      const newCmd = "chcp 65001 > nul && cmd /C " + cmd + " && chcp " + codepage + " > nul";
       exec(newCmd, opts, (error61, stdout) => {
         callback(error61, stdout);
       });
@@ -14804,7 +14804,7 @@ var require_util2 = __commonJS({
           model,
           serial,
           revisionCode,
-          memory: 256 * Math.pow(2, memSizeCode),
+          memory: 256 * 2 ** memSizeCode,
           manufacturer,
           processor,
           type: {}.hasOwnProperty.call(typeList, typeCode) ? typeList[typeCode] : "",
@@ -14913,7 +14913,7 @@ var require_util2 = __commonJS({
       const tags = ["array", "dict", "key", "string", "integer", "date", "real", "data", "boolean", "arrayEmpty"];
       const startStr = "<plist version";
       let pos = xmlStr.indexOf(startStr);
-      let len = xmlStr.length;
+      const len = xmlStr.length;
       while (xmlStr[pos] !== ">" && pos < len) {
         pos++;
       }
@@ -14921,7 +14921,7 @@ var require_util2 = __commonJS({
       let inTagStart = false;
       let inTagContent = false;
       let inTagEnd = false;
-      let metaData = [{ tagStart: "", tagEnd: "", tagContent: "", key: "", data: null }];
+      const metaData = [{ tagStart: "", tagEnd: "", tagContent: "", key: "", data: null }];
       let c2 = "";
       let cn = xmlStr[pos];
       while (pos < len) {
@@ -15119,6 +15119,38 @@ var require_util2 = __commonJS({
     __name(semverCompare, "semverCompare");
     function getAppleModel(key) {
       const appleModelIds = [
+        {
+          key: "Mac18,5",
+          name: "Mac mini",
+          size: "",
+          processor: "M6",
+          year: "2026",
+          additional: ""
+        },
+        {
+          key: "Mac17,16",
+          name: "Mac mini",
+          size: "",
+          processor: "M5 Pro",
+          year: "2026",
+          additional: ""
+        },
+        {
+          key: "Mac17,15",
+          name: "Mac Studio",
+          size: "",
+          processor: "M5 Ultra",
+          year: "2026",
+          additional: ""
+        },
+        {
+          key: "Mac17,14",
+          name: "Mac Studio",
+          size: "",
+          processor: "M5 Max",
+          year: "2026",
+          additional: ""
+        },
         {
           key: "Mac17,9",
           name: "MacBook Pro",
@@ -17758,6 +17790,9 @@ var require_network = __commonJS({
             tx_sec: null,
             ms: 0
           };
+          if (ifaceSanitized[0] === "-") {
+            return resolve2(result);
+          }
           let operstate = "unknown";
           let rx_bytes = 0;
           let tx_bytes = 0;
@@ -17768,7 +17803,8 @@ var require_network = __commonJS({
           let cmd, lines, stats;
           if (!_network[ifaceSanitized] || _network[ifaceSanitized] && !_network[ifaceSanitized].ms || _network[ifaceSanitized] && _network[ifaceSanitized].ms && Date.now() - _network[ifaceSanitized].ms >= 500) {
             if (_linux) {
-              if (fs4.existsSync("/sys/class/net/" + ifaceSanitized)) {
+              const ifaceIsSegment = ifaceSanitized !== "" && ifaceSanitized !== "." && ifaceSanitized !== ".." && ifaceSanitized.split("").every((c2) => c2 !== "/");
+              if (ifaceIsSegment && fs4.existsSync("/sys/class/net/" + ifaceSanitized)) {
                 cmd = "cat /sys/class/net/" + ifaceSanitized + "/operstate; cat /sys/class/net/" + ifaceSanitized + "/statistics/rx_bytes; cat /sys/class/net/" + ifaceSanitized + "/statistics/tx_bytes; cat /sys/class/net/" + ifaceSanitized + "/statistics/rx_dropped; cat /sys/class/net/" + ifaceSanitized + "/statistics/rx_errors; cat /sys/class/net/" + ifaceSanitized + "/statistics/tx_dropped; cat /sys/class/net/" + ifaceSanitized + "/statistics/tx_errors; ";
                 exec(cmd, (error61, stdout) => {
                   if (!error61) {
@@ -45533,6 +45569,10 @@ function discriminatedUnion2(discriminator, options) {
   return external_exports.discriminatedUnion(discriminator, options);
 }
 __name(discriminatedUnion2, "discriminatedUnion");
+function preprocess2(fn, schema) {
+  return external_exports.preprocess(fn, schema);
+}
+__name(preprocess2, "preprocess");
 
 // ../../../AppData/Local/npm-cache/_npx/f51a09bd0abf5f10/node_modules/@trigger.dev/core/dist/esm/schemas/json.js
 init_esm();
@@ -46001,10 +46041,13 @@ var WebhookIdempotencyField = external_exports.object({
   from: external_exports.enum(["header", "body"]),
   name: external_exports.string()
 });
+var WebhookBodyPath = external_exports.string().min(1).refine((path2) => path2.split(".").every((segment) => segment !== "" && !["__proto__", "constructor", "prototype"].includes(segment)), {
+  message: "body path segments must be non-empty and must not name __proto__, constructor or prototype"
+});
 var WebhookValueSource = discriminatedUnion2("from", [
   external_exports.object({ from: external_exports.literal("header"), name: external_exports.string() }),
   external_exports.object({ from: external_exports.literal("signatureField"), field: external_exports.string() }),
-  external_exports.object({ from: external_exports.literal("body"), path: external_exports.string() }),
+  external_exports.object({ from: external_exports.literal("body"), path: WebhookBodyPath }),
   external_exports.object({ from: external_exports.literal("url") }),
   external_exports.object({ from: external_exports.literal("constant"), value: external_exports.string() })
 ]);
@@ -46085,24 +46128,49 @@ var WebhookVerifierConfig = discriminatedUnion2("scheme", [
   WebhookAsymmetricConfig
 ]);
 var WebhookHandshakeConfig = external_exports.object({
+  /** Dotted path into the body, e.g. "type". Compared as a string, so a numeric 0 matches "0". */
   matchPath: external_exports.string(),
-  // dotted path into the body, e.g. "type"
+  /** e.g. "url_verification", or "0" for a numeric PING type. */
   matchValue: external_exports.string(),
-  // e.g. "url_verification"
-  respondPath: external_exports.string()
-  // dotted path to echo, e.g. "challenge"
+  /** Dotted path whose value is echoed as the text body, e.g. "challenge". Unset: empty body. */
+  respondPath: external_exports.string().optional(),
+  /** Status of the answer. Default 200; 204 always answers without a body. */
+  respondStatus: external_exports.union([external_exports.literal(200), external_exports.literal(204)]).optional()
+});
+var WebhookResponseConfig = external_exports.object({
+  /** Status for a recorded or deduplicated delivery. 204 sends no body. Default 200 with a JSON body. */
+  acceptedStatus: external_exports.union([external_exports.literal(200), external_exports.literal(202), external_exports.literal(204)]).optional(),
+  /** Status when signature verification fails. Default 400. */
+  rejectedStatus: external_exports.union([external_exports.literal(400), external_exports.literal(401), external_exports.literal(403)]).optional()
+});
+var WebhookGetHandshakeConfig = external_exports.object({
+  /** Query parameter that must equal `matchValue` for the request to count, e.g. "hub.mode". */
+  matchParam: external_exports.string().min(1).optional(),
+  /** e.g. "subscribe". Required when matchParam is set. */
+  matchValue: external_exports.string().optional(),
+  /** Query parameter carrying the endpoint's dedicated verify token, not its signing secret. */
+  tokenParam: external_exports.string().min(1),
+  /** Query parameter whose value is echoed as the plain-text 200 body. */
+  challengeParam: external_exports.string().min(1)
+}).refine((config2) => config2.matchParam === void 0 === (config2.matchValue === void 0), {
+  message: "matchParam and matchValue must be supplied together",
+  path: ["matchParam"]
 });
 var WebhookVerifierArtifact = discriminatedUnion2("kind", [
   external_exports.object({
     kind: external_exports.literal("config"),
     config: WebhookVerifierConfig,
-    handshake: WebhookHandshakeConfig.optional()
+    handshake: WebhookHandshakeConfig.optional(),
+    getHandshake: WebhookGetHandshakeConfig.optional(),
+    response: WebhookResponseConfig.optional()
   }),
   external_exports.object({
     kind: external_exports.literal("preset"),
     preset: external_exports.string(),
     config: WebhookVerifierConfig,
-    handshake: WebhookHandshakeConfig.optional()
+    handshake: WebhookHandshakeConfig.optional(),
+    getHandshake: WebhookGetHandshakeConfig.optional(),
+    response: WebhookResponseConfig.optional()
   }),
   external_exports.object({ kind: external_exports.literal("bundle"), bundleUrl: external_exports.string(), hash: external_exports.string() })
   // P3 seam
@@ -46291,7 +46359,28 @@ var QueueManifest = external_exports.object({
   /** An optional property that specifies the maximum number of concurrent run executions.
    *
    * If this property is omitted, the task can potentially use up the full concurrency of an environment */
-  concurrencyLimit: external_exports.number().int().min(0).max(1e5).optional().nullable()
+  concurrencyLimit: external_exports.number().int().min(0).max(1e5).optional().nullable(),
+  /** An optional property that caps the total number of concurrent run executions across ALL
+   * `concurrencyKey` values of this queue. On a queue with a `concurrencyKey`, `concurrencyLimit`
+   * applies per key value; this is the ceiling for the whole queue.
+   *
+   * Caps keyed and keyless runs together, and requires server-side support. */
+  combinedConcurrencyLimit: external_exports.number().int().min(0).max(1e5).optional().nullable()
+});
+var QueueGateManifest = external_exports.object({
+  queue: external_exports.string().min(1).max(128),
+  concurrencyKey: external_exports.string().min(1).max(128).optional()
+});
+var ConcurrencyShapeManifest = external_exports.object({
+  perKey: external_exports.number().int().min(1).max(1e5).optional(),
+  total: external_exports.number().int().min(1).max(1e5).optional()
+});
+var ConcurrencyLimitManifest = ConcurrencyShapeManifest.extend({
+  name: external_exports.string().min(1).max(128)
+});
+var TaskConcurrencyManifest = external_exports.object({
+  inline: ConcurrencyShapeManifest.optional(),
+  limits: external_exports.string().min(1).max(128).array().max(2).optional()
 });
 var ScheduleMetadata = external_exports.object({
   cron: external_exports.string(),
@@ -46306,6 +46395,8 @@ var taskMetadata = {
   id: external_exports.string(),
   description: external_exports.string().optional(),
   queue: QueueManifest.extend({ name: external_exports.string().optional() }).optional(),
+  gates: QueueGateManifest.array().max(2).optional(),
+  concurrency: TaskConcurrencyManifest.optional(),
   retry: RetryOptions.optional(),
   machine: MachineConfig.optional(),
   triggerSource: external_exports.string().optional(),
@@ -46517,6 +46608,7 @@ var WorkerManifest = external_exports.object({
   unclaimedSessionWebhooks: external_exports.array(external_exports.string()).optional(),
   // session.webhook descriptors no agent listed
   queues: QueueManifest.array().optional(),
+  concurrencyLimits: ConcurrencyLimitManifest.array().optional(),
   workerEntryPoint: external_exports.string(),
   controllerEntryPoint: external_exports.string().optional(),
   loaderEntryPoint: external_exports.string().optional(),
@@ -46924,6 +47016,10 @@ var indexerToWorkerMessages = {
   }),
   TASKS_FAILED_TO_PARSE: TaskMetadataFailedToParseData,
   TASKS_FAILED_TO_INDEX: external_exports.object({
+    version: external_exports.literal("v1").default("v1"),
+    collisions: external_exports.array(external_exports.object({ id: external_exports.string(), filePaths: external_exports.array(external_exports.string()) }))
+  }),
+  WEBHOOKS_FAILED_TO_INDEX: external_exports.object({
     version: external_exports.literal("v1").default("v1"),
     collisions: external_exports.array(external_exports.object({ id: external_exports.string(), filePaths: external_exports.array(external_exports.string()) }))
   }),
@@ -47440,7 +47536,7 @@ var nanoid3 = /* @__PURE__ */ __name((size = 21) => {
 
 // ../../../AppData/Local/npm-cache/_npx/f51a09bd0abf5f10/node_modules/@trigger.dev/core/dist/esm/version.js
 init_esm();
-var VERSION = "4.6.4";
+var VERSION = "4.7.2";
 
 // ../../../AppData/Local/npm-cache/_npx/f51a09bd0abf5f10/node_modules/@trigger.dev/core/dist/esm/v3/apiKeys.js
 init_esm();
@@ -47485,6 +47581,8 @@ var TaskResource = external_exports.object({
   filePath: external_exports.string(),
   exportName: external_exports.string().optional(),
   queue: QueueManifest.extend({ name: external_exports.string().optional() }).optional(),
+  gates: QueueGateManifest.array().max(2).optional(),
+  concurrency: TaskConcurrencyManifest.optional(),
   retry: RetryOptions.optional(),
   machine: MachineConfig.optional(),
   triggerSource: external_exports.string().optional(),
@@ -47537,6 +47635,7 @@ var BackgroundWorkerMetadata = external_exports.object({
   webhooks: external_exports.array(WebhookResource).optional(),
   // NEW
   queues: external_exports.array(QueueManifest).optional(),
+  concurrencyLimits: external_exports.array(ConcurrencyLimitManifest).optional(),
   sourceFiles: external_exports.array(BackgroundWorkerSourceFileMetadata).optional(),
   runtime: external_exports.string().optional(),
   runtimeVersion: external_exports.string().optional()
@@ -47551,7 +47650,7 @@ init_esm();
 var queueTypes = ["task", "custom"];
 var QueueType = external_exports.enum(queueTypes);
 var RetrieveQueueType = external_exports.enum([...queueTypes, "id"]);
-var QueueItem = external_exports.object({
+var QueueItemCommon = {
   /** The queue id, e.g. queue_12345 */
   id: external_exports.string(),
   /** The queue name */
@@ -47568,22 +47667,39 @@ var QueueItem = external_exports.object({
   queued: external_exports.number(),
   /** Whether the queue is paused. If it's paused, no new runs will be started. */
   paused: external_exports.boolean(),
-  /** The concurrency limit of the queue */
-  concurrencyLimit: external_exports.number().nullable(),
-  /** The concurrency limit of the queue */
-  concurrency: external_exports.object({
-    /** The effective/current concurrency limit */
-    current: external_exports.number().nullable(),
-    /** The base concurrency limit (default) */
-    base: external_exports.number().nullable(),
-    /** The effective/current concurrency limit */
-    override: external_exports.number().nullable(),
-    /** When the override was applied */
-    overriddenAt: external_exports.coerce.date().nullable(),
-    /** Who overrode the concurrency limit (will be null if overridden via the API) */
-    overriddenBy: external_exports.string().nullable()
-  }).optional()
-});
+  /**
+   * The queue's own concurrency limit. Meaningful on V1 queues only; always
+   * null on V2 queues (kept on both so existing clients keep parsing).
+   */
+  concurrencyLimit: external_exports.number().nullable()
+};
+var QueueItemUnion = discriminatedUnion2("version", [
+  external_exports.object({
+    ...QueueItemCommon,
+    version: external_exports.literal("V1"),
+    /** The queue's concurrency limit override state */
+    concurrency: external_exports.object({
+      /** The effective/current concurrency limit */
+      current: external_exports.number().nullable(),
+      /** The base concurrency limit (default) */
+      base: external_exports.number().nullable(),
+      /** The overridden concurrency limit, when an override is active */
+      override: external_exports.number().nullable(),
+      /** When the override was applied */
+      overriddenAt: external_exports.coerce.date().nullable(),
+      /** Who overrode the concurrency limit (will be null if overridden via the API) */
+      overriddenBy: external_exports.string().nullable()
+    }).optional()
+  }),
+  external_exports.object({
+    ...QueueItemCommon,
+    version: external_exports.literal("V2"),
+    /** Never present on V2 queues; declared so existing `queue.concurrency?.…`
+     * reads keep compiling across the union and see undefined. */
+    concurrency: external_exports.undefined().optional()
+  })
+]);
+var QueueItem = preprocess2((value2) => value2 && typeof value2 === "object" && !("version" in value2) ? { ...value2, version: "V1" } : value2, QueueItemUnion);
 var ListQueueOptions = external_exports.object({
   /** The page number */
   page: external_exports.number().optional(),
@@ -47599,6 +47715,40 @@ var QueueTypeName = external_exports.object({
   name: external_exports.string()
 });
 var RetrieveQueueParam = external_exports.union([external_exports.string(), QueueTypeName]);
+var ConcurrencyLimitBound = external_exports.object({
+  current: external_exports.number().nullable(),
+  base: external_exports.number().nullable(),
+  override: external_exports.number().nullable(),
+  overriddenAt: external_exports.coerce.date().nullable()
+});
+var ConcurrencyLimitItem = external_exports.object({
+  /** The limit's id, starting with `climit_`. */
+  id: external_exports.string(),
+  /** The limit's name, as declared with `concurrencyLimit()` (anonymous inline
+   * limits use the derived name `task/<taskId>`). */
+  name: external_exports.string(),
+  /** Caps each concurrencyKey pool; runs without a key share one pool. */
+  perKey: ConcurrencyLimitBound,
+  /** Caps every run holding this limit, keys or not. */
+  total: ConcurrencyLimitBound,
+  /** Runs executing that hold this limit. */
+  running: external_exports.number(),
+  /** Runs that are queued and must clear this limit to execute. */
+  queued: external_exports.number(),
+  /** Whether the limit is paused. A paused limit admits no runs until resumed;
+   * its configured bounds are kept. Older servers omit the field. */
+  paused: external_exports.boolean().default(false)
+});
+var ListConcurrencyLimitOptions = external_exports.object({
+  page: external_exports.number().optional(),
+  perPage: external_exports.number().optional()
+});
+var OverrideConcurrencyLimitRequestBody = external_exports.object({
+  perKey: external_exports.number().int().min(0).max(1e5).optional(),
+  total: external_exports.number().int().min(0).max(1e5).optional()
+}).refine((body) => body.perKey !== void 0 || body.total !== void 0, {
+  message: "Provide at least one of `perKey` or `total`"
+});
 
 // ../../../AppData/Local/npm-cache/_npx/f51a09bd0abf5f10/node_modules/@trigger.dev/core/dist/esm/v3/schemas/api.js
 var RunEngineVersion = external_exports.union([external_exports.literal("V1"), external_exports.literal("V2")]);
@@ -47668,6 +47818,15 @@ var CreateOrgResponseBody = external_exports.object({
   title: external_exports.string(),
   slug: external_exports.string(),
   createdAt: external_exports.coerce.date()
+});
+var ActivateFreePlanResponseBody = external_exports.object({
+  plan: external_exports.literal("free")
+});
+var CompleteProfileRequestBody = external_exports.object({
+  name: external_exports.string().trim().min(3).max(50)
+});
+var CompleteProfileResponseBody = external_exports.object({
+  updated: external_exports.boolean()
 });
 var CreateProjectRequestBody = external_exports.object({
   name: external_exports.string().trim().min(1, "Name is required").max(255, "Name must be less than 255 characters")
@@ -47748,6 +47907,9 @@ var IdempotencyKeyOptionsSchema = external_exports.object({
   scope: external_exports.enum(["run", "attempt", "global"])
 });
 var ConcurrencyKeySchema = external_exports.union([external_exports.string(), external_exports.number()]).transform((value2) => String(value2));
+var TriggerConcurrencyLimitsSchema = external_exports.string().regex(/^[a-zA-Z0-9_-]{1,122}$/, {
+  message: "Concurrency limit names are 1-122 characters using only letters, numbers, underscores and hyphens"
+}).array().max(2);
 var ExternalDeploymentId = external_exports.preprocess((value2) => {
   if (value2 === null) {
     return void 0;
@@ -47800,6 +47962,11 @@ var TriggerTaskRequestBody = external_exports.object({
       // @deprecated, this is now specified on the queue
       concurrencyLimit: external_exports.number().int().optional()
     }).optional(),
+    gates: external_exports.array(external_exports.object({
+      queue: external_exports.string().min(1).max(128),
+      concurrencyKey: external_exports.string().min(1).max(128).optional()
+    })).max(3).optional(),
+    concurrency: TriggerConcurrencyLimitsSchema.optional(),
     concurrencyKey: ConcurrencyKeySchema.optional(),
     delay: external_exports.string().or(external_exports.coerce.date()).optional(),
     idempotencyKey: external_exports.string().max(2048, "idempotencyKey must be 2048 characters or less").optional(),
@@ -47877,6 +48044,11 @@ var BatchTriggerTaskItem = external_exports.object({
     queue: external_exports.object({
       name: external_exports.string()
     }).optional(),
+    gates: external_exports.array(external_exports.object({
+      queue: external_exports.string().min(1).max(128),
+      concurrencyKey: external_exports.string().min(1).max(128).optional()
+    })).max(3).optional(),
+    concurrency: TriggerConcurrencyLimitsSchema.optional(),
     tags: RunTags.optional(),
     test: external_exports.boolean().optional(),
     ttl: external_exports.string().or(external_exports.number().nonnegative().int()).optional(),
@@ -48002,6 +48174,7 @@ var RescheduleRunRequestBody = external_exports.object({
   delay: external_exports.string().or(external_exports.coerce.date())
 });
 var GetEnvironmentVariablesResponseBody = external_exports.object({
+  allowEmptyEnvironmentVariableValues: external_exports.boolean().optional(),
   variables: external_exports.record(external_exports.string(), external_exports.string())
 });
 var StartDeploymentIndexingRequestBody = external_exports.object({
@@ -48880,6 +49053,12 @@ var SessionTriggerConfig = external_exports.object({
   basePayload: external_exports.record(external_exports.string(), external_exports.unknown()),
   machine: MachinePresetName.optional(),
   queue: external_exports.string().max(128).optional(),
+  /** Named concurrency limits every run holds, replacing the task's declared named limits.
+   * The charset rule is enforced here so a bad name is rejected before the session row
+   * persists, instead of surfacing from the trigger after the session already exists. */
+  concurrency: TriggerConcurrencyLimitsSchema.optional(),
+  /** Scopes every run to its own pool under each `perKey` bound it holds. Never defaulted — a session without one shares the keyless pool. */
+  concurrencyKey: ConcurrencyKeySchema.optional(),
   tags: external_exports.array(external_exports.string().max(128)).max(10).optional(),
   maxAttempts: external_exports.number().int().positive().max(10).optional(),
   /** Per-run wall-clock cap (seconds). Forwarded to `TaskRunOptions.maxDuration`. */
@@ -53381,10 +53560,10 @@ ZodEffects.create = (schema, effect, params) => {
     ...processCreateParams(params)
   });
 };
-ZodEffects.createWithPreprocess = (preprocess2, schema, params) => {
+ZodEffects.createWithPreprocess = (preprocess3, schema, params) => {
   return new ZodEffects({
     schema,
-    effect: { type: "preprocess", transform: preprocess2 },
+    effect: { type: "preprocess", transform: preprocess3 },
     typeName: ZodFirstPartyTypeKind2.ZodEffects,
     ...processCreateParams(params)
   });
@@ -58636,7 +58815,9 @@ var SSEStreamSubscription = class {
   lastEventId;
   from;
   retryCount = 0;
+  stallCount = 0;
   maxRetries;
+  maxStallRetries;
   retryDelayMs;
   maxRetryDelayMs;
   retryJitter;
@@ -58666,6 +58847,7 @@ var SSEStreamSubscription = class {
     this.lastEventId = options.lastEventId;
     this.from = options.from ?? "beginning";
     this.maxRetries = options.maxRetries ?? Infinity;
+    this.maxStallRetries = options.maxStallRetries ?? Infinity;
     this.retryDelayMs = options.retryDelayMs ?? 100;
     this.maxRetryDelayMs = options.maxRetryDelayMs ?? 5e3;
     this.retryJitter = options.retryJitter ?? 0.5;
@@ -58758,7 +58940,12 @@ var SSEStreamSubscription = class {
       if (this.stallTimeoutMs <= 0)
         return;
       clearTimeout(stallTimer);
-      stallTimer = setTimeout(() => this.internalAbort?.abort(), this.stallTimeoutMs);
+      stallTimer = setTimeout(() => {
+        if (!this.internalAbort || this.internalAbort.signal.aborted)
+          return;
+        this.stallCount++;
+        this.internalAbort.abort();
+      }, this.stallTimeoutMs);
     }, "armStall");
     const cleanupAttempt = /* @__PURE__ */ __name(() => {
       clearTimeout(fetchTimer);
@@ -58803,7 +58990,6 @@ var SSEStreamSubscription = class {
       }
       const streamVersion = response.headers.get("X-Stream-Version") ?? "v1";
       this.sessionSettled = response.headers.get("X-Session-Settled") === "true";
-      this.retryCount = 0;
       armStall();
       const SEEN_IDS_CAP = 5e3;
       const seenIds = /* @__PURE__ */ new Set();
@@ -58880,6 +59066,8 @@ var SSEStreamSubscription = class {
           }
           armStall();
           this.authRefreshed = false;
+          this.retryCount = 0;
+          this.stallCount = 0;
           controller.enqueue(value2);
         }
       } catch (error61) {
@@ -58933,8 +59121,9 @@ var SSEStreamSubscription = class {
       controller.close();
       return;
     }
-    if (this.retryCount >= this.maxRetries) {
-      const finalError = error61 || new Error("Max retries reached");
+    const stallsExhausted = this.stallCount > this.maxStallRetries;
+    if (this.retryCount >= this.maxRetries || stallsExhausted) {
+      const finalError = stallsExhausted ? new Error("Stream stalled: no records received") : error61?.name === "AbortError" ? new Error("Stream connection retries exhausted") : error61 || new Error("Max retries reached");
       controller.error(finalError);
       this.options.onError?.(finalError);
       return;
@@ -60139,6 +60328,44 @@ var ApiClient = class {
       body: JSON.stringify({
         type
       })
+    }, mergeRequestOptions(this.defaultRequestOptions, requestOptions));
+  }
+  listConcurrencyLimits(options, requestOptions) {
+    return zodfetchOffsetLimitPage(ConcurrencyLimitItem, `${this.baseUrl}/api/v1/concurrency-limits`, {
+      page: options?.page,
+      limit: options?.perPage
+    }, {
+      method: "GET",
+      headers: this.#getHeaders(false)
+    }, mergeRequestOptions(this.defaultRequestOptions, requestOptions));
+  }
+  retrieveConcurrencyLimit(name, requestOptions) {
+    return zodfetch(ConcurrencyLimitItem, `${this.baseUrl}/api/v1/concurrency-limits/${encodeURIComponent(name)}`, {
+      method: "GET",
+      headers: this.#getHeaders(false)
+    }, mergeRequestOptions(this.defaultRequestOptions, requestOptions));
+  }
+  overrideConcurrencyLimit(name, override, requestOptions) {
+    return zodfetch(ConcurrencyLimitItem, `${this.baseUrl}/api/v1/concurrency-limits/${encodeURIComponent(name)}/override`, {
+      method: "POST",
+      headers: this.#getHeaders(false),
+      body: JSON.stringify(override)
+    }, mergeRequestOptions(this.defaultRequestOptions, requestOptions));
+  }
+  pauseConcurrencyLimit(name, action, requestOptions) {
+    return zodfetch(ConcurrencyLimitItem, `${this.baseUrl}/api/v1/concurrency-limits/${encodeURIComponent(name)}/pause`, {
+      method: "POST",
+      headers: this.#getHeaders(false),
+      body: JSON.stringify({
+        action
+      })
+    }, mergeRequestOptions(this.defaultRequestOptions, requestOptions));
+  }
+  resetConcurrencyLimit(name, requestOptions) {
+    return zodfetch(ConcurrencyLimitItem, `${this.baseUrl}/api/v1/concurrency-limits/${encodeURIComponent(name)}/reset`, {
+      method: "POST",
+      headers: this.#getHeaders(false),
+      body: JSON.stringify({})
     }, mergeRequestOptions(this.defaultRequestOptions, requestOptions));
   }
   subscribeToRun(runId, options) {
@@ -66785,6 +67012,11 @@ var NoopResourceCatalog = class {
   listQueueManifests() {
     return [];
   }
+  registerConcurrencyLimitMetadata(limit) {
+  }
+  listConcurrencyLimitManifests() {
+    return [];
+  }
   registerPromptMetadata(prompt) {
   }
   listPromptManifests() {
@@ -66884,6 +67116,12 @@ var ResourceCatalogAPI = class _ResourceCatalogAPI {
   }
   listQueueManifests() {
     return this.#getCatalog().listQueueManifests();
+  }
+  registerConcurrencyLimitMetadata(limit) {
+    this.#getCatalog().registerConcurrencyLimitMetadata(limit);
+  }
+  listConcurrencyLimitManifests() {
+    return this.#getCatalog().listConcurrencyLimitManifests();
   }
   registerPromptMetadata(prompt) {
     this.#getCatalog().registerPromptMetadata(prompt);
@@ -69270,6 +69508,7 @@ var StandardResourceCatalog = class {
   _promptSchemas = /* @__PURE__ */ new Map();
   _currentFileContext;
   _queueMetadata = /* @__PURE__ */ new Map();
+  _concurrencyLimitMetadata = /* @__PURE__ */ new Map();
   _skillMetadata = /* @__PURE__ */ new Map();
   _skillFileMetadata = /* @__PURE__ */ new Map();
   _webhookMetadata = /* @__PURE__ */ new Map();
@@ -69297,20 +69536,42 @@ var StandardResourceCatalog = class {
     const existingQueue = this._queueMetadata.get(queue.name);
     if (existingQueue) {
       const isConcurrencyLimitDifferent = existingQueue.concurrencyLimit !== queue.concurrencyLimit;
-      if (isConcurrencyLimitDifferent) {
+      const isCombinedLimitDifferent = existingQueue.combinedConcurrencyLimit !== queue.combinedConcurrencyLimit;
+      if (isConcurrencyLimitDifferent || isCombinedLimitDifferent) {
         let message = `Queue "${queue.name}" is defined twice, with different settings.`;
         if (isConcurrencyLimitDifferent) {
           message += `
         - concurrencyLimit: ${existingQueue.concurrencyLimit} vs ${queue.concurrencyLimit}`;
         }
+        if (isCombinedLimitDifferent) {
+          message += `
+        - combinedConcurrencyLimit: ${existingQueue.combinedConcurrencyLimit} vs ${queue.combinedConcurrencyLimit}`;
+        }
         message += "\n       Keeping the first definition:";
         message += `
         - concurrencyLimit: ${existingQueue.concurrencyLimit}`;
+        if (existingQueue.combinedConcurrencyLimit != null) {
+          message += `
+        - combinedConcurrencyLimit: ${existingQueue.combinedConcurrencyLimit}`;
+        }
         console.warn(message);
         return;
       }
     }
     this._queueMetadata.set(queue.name, queue);
+  }
+  registerConcurrencyLimitMetadata(limit) {
+    const existing = this._concurrencyLimitMetadata.get(limit.name);
+    if (existing) {
+      if (existing.perKey !== limit.perKey || existing.total !== limit.total) {
+        console.warn(`Concurrency limit "${limit.name}" is defined twice, with different settings.
+        - perKey: ${existing.perKey} vs ${limit.perKey}
+        - total: ${existing.total} vs ${limit.total}
+       Keeping the first definition.`);
+        return;
+      }
+    }
+    this._concurrencyLimitMetadata.set(limit.name, limit);
   }
   registerWorkerManifest(workerManifest) {
     for (const task of workerManifest.tasks) {
@@ -69397,6 +69658,9 @@ var StandardResourceCatalog = class {
   }
   listQueueManifests() {
     return Array.from(this._queueMetadata.values());
+  }
+  listConcurrencyLimitManifests() {
+    return Array.from(this._concurrencyLimitMetadata.values());
   }
   getTaskManifest(id) {
     const metadata = this._taskMetadata.get(id);
@@ -72184,7 +72448,7 @@ function normalizeImportPath(importPath) {
 __name(normalizeImportPath, "normalizeImportPath");
 
 export {
-  toJSONSchema,
+  core_exports2 as core_exports,
   external_exports,
   discriminatedUnion2 as discriminatedUnion,
   TaskRunErrorCodes,
@@ -72270,4 +72534,4 @@ export {
    * limitations under the License.
    *)
 */
-//# sourceMappingURL=chunk-24PGE3V7.mjs.map
+//# sourceMappingURL=chunk-24YXLGBO.mjs.map

@@ -4,14 +4,14 @@ import {
   TracingSDK,
   ZodFirstPartyTypeKind,
   ZodSchemaParsedError,
+  core_exports,
   indexerToWorkerMessages,
   normalizeImportPath,
   o,
   require_source_map_support,
   resourceCatalog,
-  sendMessageInCatalog,
-  toJSONSchema
-} from "../../../../../../../../../../chunk-24PGE3V7.mjs";
+  sendMessageInCatalog
+} from "../../../../../../../../../../chunk-24YXLGBO.mjs";
 import "../../../../../../../../../../chunk-ZQK7JG23.mjs";
 import "../../../../../../../../../../chunk-IKSFYADO.mjs";
 import {
@@ -16582,6 +16582,108 @@ function compactUnion(members) {
 }
 __name(compactUnion, "compactUnion");
 
+// ../../../AppData/Local/npm-cache/_npx/f51a09bd0abf5f10/node_modules/@trigger.dev/schema-to-json/dist/esm/zod4.js
+init_esm();
+function convertZod4Schema(schema, options, converter = core_exports) {
+  const useReferences = options?.useReferences ?? false;
+  const supportsUnrepresentableHandler = converter.version.major > 4 || converter.version.major === 4 && converter.version.minor >= 5;
+  return converter.toJSONSchema(schema, {
+    target: "draft-7",
+    io: "output",
+    reused: useReferences ? "ref" : "inline",
+    unrepresentable: supportsUnrepresentableHandler ? ({ zodSchema }) => zodSchema._zod.def.type === "date" ? { type: "string", format: "date-time" } : "throw" : "any",
+    override: /* @__PURE__ */ __name(({ zodSchema, jsonSchema }) => {
+      const def = zodSchema._zod.def;
+      if (!supportsUnrepresentableHandler) {
+        enforceLegacyUnrepresentableTypes(def, jsonSchema);
+      }
+      if (def.type === "date") {
+        jsonSchema.type = "string";
+        jsonSchema.format = "date-time";
+      }
+      if (def.type === "undefined") {
+        throw new Error("Undefined cannot be represented in JSON Schema");
+      }
+      if (def.type === "object" && jsonSchema.required) {
+        const required = jsonSchema.required.filter((key) => {
+          const field = def.shape[key];
+          return !field || field._zod.optout === "optional" || !hasOptionalOutput(field);
+        });
+        if (required.length > 0) {
+          jsonSchema.required = required;
+        } else {
+          delete jsonSchema.required;
+        }
+      }
+    }, "override")
+  });
+}
+__name(convertZod4Schema, "convertZod4Schema");
+function enforceLegacyUnrepresentableTypes(def, jsonSchema) {
+  switch (def.type) {
+    case "bigint":
+      throw new Error("BigInt cannot be represented in JSON Schema");
+    case "symbol":
+      throw new Error("Symbols cannot be represented in JSON Schema");
+    case "void":
+      throw new Error("Void cannot be represented in JSON Schema");
+    case "map":
+      throw new Error("Map cannot be represented in JSON Schema");
+    case "set":
+      throw new Error("Set cannot be represented in JSON Schema");
+    case "transform":
+      throw new Error("Transforms cannot be represented in JSON Schema");
+    case "nan":
+      throw new Error("NaN cannot be represented in JSON Schema");
+    case "custom":
+      throw new Error("Custom types cannot be represented in JSON Schema");
+    case "function":
+      throw new Error("Function types cannot be represented in JSON Schema");
+    case "literal": {
+      if (def.values.some((value) => value === void 0)) {
+        throw new Error("Literal `undefined` cannot be represented in JSON Schema");
+      }
+      if (def.values.some((value) => typeof value === "bigint")) {
+        throw new Error("BigInt literals cannot be represented in JSON Schema");
+      }
+      return;
+    }
+    case "catch": {
+      if ("default" in jsonSchema)
+        return;
+      try {
+        def.catchValue(void 0);
+      } catch {
+        throw new Error("Dynamic catch values are not supported in JSON Schema");
+      }
+    }
+  }
+}
+__name(enforceLegacyUnrepresentableTypes, "enforceLegacyUnrepresentableTypes");
+function hasOptionalOutput(schema, seen = /* @__PURE__ */ new Set()) {
+  if (schema._zod.optout === "optional")
+    return true;
+  if (seen.has(schema))
+    return false;
+  seen.add(schema);
+  const def = schema._zod.def;
+  switch (def.type) {
+    case "union":
+      return def.options.some((option) => hasOptionalOutput(option, seen));
+    case "nullable":
+    case "readonly":
+    case "catch":
+      return hasOptionalOutput(def.innerType, seen);
+    case "lazy":
+      return hasOptionalOutput(def.getter(), seen);
+    case "pipe":
+      return hasOptionalOutput(def.out, seen);
+    default:
+      return false;
+  }
+}
+__name(hasOptionalOutput, "hasOptionalOutput");
+
 // ../../../AppData/Local/npm-cache/_npx/f51a09bd0abf5f10/node_modules/@trigger.dev/schema-to-json/dist/esm/index.js
 function schemaToJsonSchema(schema, options) {
   if (schema === null || typeof schema !== "object" && typeof schema !== "function") {
@@ -16658,55 +16760,6 @@ function convertZod3Schema(schema, options) {
   });
 }
 __name(convertZod3Schema, "convertZod3Schema");
-function convertZod4Schema(schema, options) {
-  const useReferences = options?.useReferences ?? false;
-  return toJSONSchema(schema, {
-    target: "draft-7",
-    io: "output",
-    reused: useReferences ? "ref" : "inline",
-    override: /* @__PURE__ */ __name(({ zodSchema, jsonSchema }) => {
-      const def = zodSchema._zod.def;
-      if (def.type === "undefined") {
-        throw new Error("Undefined cannot be represented in JSON Schema");
-      }
-      if (def.type === "object" && jsonSchema.required) {
-        const required = jsonSchema.required.filter((key) => {
-          const field = def.shape[key];
-          return !field || field._zod.optout === "optional" || !hasOptionalOutput(field);
-        });
-        if (required.length > 0) {
-          jsonSchema.required = required;
-        } else {
-          delete jsonSchema.required;
-        }
-      }
-    }, "override")
-  });
-}
-__name(convertZod4Schema, "convertZod4Schema");
-function hasOptionalOutput(schema, seen = /* @__PURE__ */ new Set()) {
-  if (schema._zod.optout === "optional")
-    return true;
-  if (seen.has(schema))
-    return false;
-  seen.add(schema);
-  const def = schema._zod.def;
-  switch (def.type) {
-    case "union":
-      return def.options.some((option) => hasOptionalOutput(option, seen));
-    case "nullable":
-    case "readonly":
-    case "catch":
-      return hasOptionalOutput(def.innerType, seen);
-    case "lazy":
-      return hasOptionalOutput(def.getter(), seen);
-    case "pipe":
-      return hasOptionalOutput(def.out, seen);
-    default:
-      return false;
-  }
-}
-__name(hasOptionalOutput, "hasOptionalOutput");
 function isYupSchema(schema) {
   return "spec" in schema && "_typeCheck" in schema;
 }
@@ -16868,6 +16921,7 @@ await sendMessageInCatalog(indexerToWorkerMessages, "INDEX_COMPLETE", {
     prompts: convertPromptSchemasToJsonSchemas(resourceCatalog.listPromptManifests()),
     skills: resourceCatalog.listSkillManifests(),
     queues: resourceCatalog.listQueueManifests(),
+    concurrencyLimits: resourceCatalog.listConcurrencyLimitManifests(),
     configPath: buildManifest.configPath,
     runtime: buildManifest.runtime,
     runtimeVersion: detectRuntimeVersion(),

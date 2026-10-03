@@ -1,18 +1,20 @@
 {
-  "configPath": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-9OwmbM\\OneDrive\\Desktop\\almacal\\trigger.config.mjs",
+  "concurrencyLimits": [
+  ],
+  "configPath": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-dtZVIJ\\OneDrive\\Desktop\\almacal\\trigger.config.mjs",
   "customConditions": [
   ],
   "prompts": [
   ],
   "queues": [
   ],
-  "runtime": "node",
+  "runtime": "node-24",
   "runtimeVersion": "22.14.0",
   "skills": [
   ],
   "tasks": [
     {
-      "entryPoint": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-9OwmbM\\OneDrive\\Desktop\\almacal\\src\\trigger\\analyze-meal.mjs",
+      "entryPoint": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-dtZVIJ\\OneDrive\\Desktop\\almacal\\src\\trigger\\analyze-meal.mjs",
       "filePath": "src/trigger/analyze-meal.ts",
       "id": "analyze-meal",
       "maxDuration": 120,
@@ -44,7 +46,7 @@
       }
     },
     {
-      "entryPoint": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-9OwmbM\\OneDrive\\Desktop\\almacal\\src\\trigger\\clerk-users.mjs",
+      "entryPoint": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-dtZVIJ\\OneDrive\\Desktop\\almacal\\src\\trigger\\clerk-users.mjs",
       "filePath": "src/trigger/clerk-users.ts",
       "id": "clerk-user-created",
       "maxDuration": 60,
@@ -56,7 +58,7 @@
       }
     },
     {
-      "entryPoint": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-9OwmbM\\OneDrive\\Desktop\\almacal\\src\\trigger\\clerk-users.mjs",
+      "entryPoint": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-dtZVIJ\\OneDrive\\Desktop\\almacal\\src\\trigger\\clerk-users.mjs",
       "filePath": "src/trigger/clerk-users.ts",
       "id": "clerk-user-updated",
       "maxDuration": 60,
@@ -68,7 +70,7 @@
       }
     },
     {
-      "entryPoint": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-9OwmbM\\OneDrive\\Desktop\\almacal\\src\\trigger\\clerk-users.mjs",
+      "entryPoint": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-dtZVIJ\\OneDrive\\Desktop\\almacal\\src\\trigger\\clerk-users.mjs",
       "filePath": "src/trigger/clerk-users.ts",
       "id": "clerk-user-deleted",
       "maxDuration": 60,
@@ -80,7 +82,7 @@
       }
     },
     {
-      "entryPoint": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-9OwmbM\\OneDrive\\Desktop\\almacal\\src\\trigger\\generate-plan.mjs",
+      "entryPoint": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-dtZVIJ\\OneDrive\\Desktop\\almacal\\src\\trigger\\generate-plan.mjs",
       "filePath": "src/trigger/generate-plan.ts",
       "id": "generate-plan",
       "maxDuration": 120,
@@ -169,9 +171,9 @@
     }
   ],
   "timings": {
-    "src/trigger/analyze-meal.ts": 103.17849999999999,
-    "src/trigger/clerk-users.ts": 10.899400000000014,
-    "src/trigger/generate-plan.ts": 8.086900000000014
+    "src/trigger/analyze-meal.ts": 221.97800000000007,
+    "src/trigger/clerk-users.ts": 122.21630000000005,
+    "src/trigger/generate-plan.ts": 5.4956999999999425
   },
-  "workerEntryPoint": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-9OwmbM\\AppData\\Local\\npm-cache\\_npx\\f51a09bd0abf5f10\\node_modules\\trigger.dev\\dist\\esm\\entryPoints\\dev-run-worker.mjs"
+  "workerEntryPoint": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-dtZVIJ\\AppData\\Local\\npm-cache\\_npx\\f51a09bd0abf5f10\\node_modules\\trigger.dev\\dist\\esm\\entryPoints\\dev-run-worker.mjs"
 }

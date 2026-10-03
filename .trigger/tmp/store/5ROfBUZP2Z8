@@ -60,7 +60,7 @@ import {
   traceContext,
   usage,
   waitUntil
-} from "../../../../../../../../../../chunk-24PGE3V7.mjs";
+} from "../../../../../../../../../../chunk-24YXLGBO.mjs";
 import "../../../../../../../../../../chunk-ZQK7JG23.mjs";
 import {
   context,
@@ -245,7 +245,9 @@ var Packet = discriminatedUnion("type", [
   }),
   external_exports.object({
     type: external_exports.literal("ACK"),
-    message: external_exports.any(),
+    // Optional: a void callback acks with `message: undefined`, and `process.send`
+    // drops undefined keys when serializing, so the key is absent on arrival.
+    message: external_exports.any().optional(),
     id: external_exports.number()
   }),
   external_exports.object({
@@ -400,7 +402,7 @@ import { setTimeout as setTimeout2 } from "node:timers/promises";
 
 // ../../../AppData/Local/npm-cache/_npx/f51a09bd0abf5f10/node_modules/trigger.dev/dist/esm/version.js
 init_esm();
-var VERSION = "4.6.4";
+var VERSION = "4.7.2";
 
 // ../../../AppData/Local/npm-cache/_npx/f51a09bd0abf5f10/node_modules/trigger.dev/dist/esm/entryPoints/dev-run-worker.js
 import_source_map_support.default.install({

@@ -11,10 +11,11 @@ import { LogWeightModal } from "@/components/log-weight-modal";
 import { StreakCalendarCard } from "@/components/streak-calendar-card";
 import { WeightTrendCard, type WeightPoint } from "@/components/weight-chart";
 import { BottomTabInset } from "@/constants/theme";
-import { useProgress } from "@/lib/api";
+import { useProfile, useProgress } from "@/lib/api";
 import { useThemeColors } from "@/lib/theme";
 
 const PROGRESS_DAYS = 30;
+const LB_PER_KG = 2.20462;
 
 /** "2026-05-18" -> "May 18" / "18 Mei", mengikuti bahasa aplikasi (bukan bahasa perangkat). */
 const formatDay = (iso: string, language: string) =>
@@ -93,6 +94,10 @@ export default function Progress() {
 
   const { data, isPending, isError, refetch } = useProgress(PROGRESS_DAYS);
 
+  // Database selalu menyimpan kg; konversi ke lbs hanya untuk tampilan.
+  const { data: profile } = useProfile();
+  const imperial = profile?.unitPreference === "imperial";
+
   // Tab ini tetap hidup di belakang tab lain, jadi tarik ulang data tiap kali dibuka
   // (mis. setelah mencatat makanan). Fokus pertama dilewati karena query sudah jalan sendiri.
   const firstFocus = useRef(true);
@@ -108,7 +113,7 @@ export default function Progress() {
 
   const weightPoints: WeightPoint[] = (data?.weight ?? []).map((p) => ({
     label: formatDay(p.date, i18n.language),
-    value: p.value,
+    value: imperial ? Math.round(p.value * LB_PER_KG * 10) / 10 : p.value,
   }));
 
   return (
@@ -153,6 +158,7 @@ export default function Progress() {
             <WeightTrendCard
               points={weightPoints}
               periodLabel={t("progress.vsDays", { count: PROGRESS_DAYS })}
+              unit={imperial ? "lbs" : "kg"}
               onLogPress={() => setLogOpen(true)}
             />
             <ConsistencyCard days={data.consistency.map((d) => d.status)} />

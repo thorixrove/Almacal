@@ -162,12 +162,15 @@ export function WeightChart({ points, unit = "kg" }: { points: WeightPoint[]; un
 export function WeightTrendCard({
   points = MOCK_WEIGHT,
   periodLabel,
+  unit = "kg",
   onLogPress,
 }: {
   points?: WeightPoint[];
   periodLabel?: string;
   /** Kalau diisi, tombol "Log" muncul di pojok kanan atas kartu. */
   onLogPress?: () => void;
+  /** Satuan tampilan. Nilai di `points` harus sudah dikonversi ke satuan ini. */
+  unit?: "kg" | "lbs";
 }) {
   const theme = useThemeColors();
   const { t } = useTranslation();
@@ -195,13 +198,13 @@ export function WeightTrendCard({
         ) : null}
       </View>
       <Text className="mt-[10px] text-[22px] font-bold tracking-[-0.4px] text-black dark:text-white">
-        {hasDelta ? `${sign}${Math.abs(delta).toFixed(1)} kg` : "—"}
+        {hasDelta ? `${sign}${Math.abs(delta).toFixed(1)} ${unit}` : "—"}
       </Text>
       <Text className="mt-[2px] text-[13px] text-[#8A8A90] dark:text-[#9A9AA0]">
         {periodLabel ?? t("progress.vsDays", { count: 30 })}
       </Text>
 
-      <WeightChart points={points} />
+      <WeightChart points={points} unit={unit} />
     </View>
   );
 }

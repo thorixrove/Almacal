@@ -5,7 +5,6 @@ export default defineConfig({
   out: './drizzle',
   dialect: 'postgresql',
   casing: "snake_case",
-  tablesFilter: ['users', 'meals', 'foods'],
   dbCredentials: {
     url: process.env.DATABASE_URL!,
   },

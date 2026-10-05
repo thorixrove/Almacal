@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 // Type-only: the schema file pulls in zod, which the app bundle doesn't need.
 import type { Plan, PlanInput } from '@/lib/plan';
-import type { Meal, User } from '@/db/schema';
+import type { Food, Meal, User } from '@/db/schema';
 import type { ProgressResponse } from '@/app/api/progress+api';
 import { answers, draft } from '@/onboarding/steps';
 
@@ -317,5 +317,41 @@ export function useLogMeal() {
         reason: String(error),
         image_bytes: image.length,
       }),
+  });
+}
+
+
+/** Satu baris di halaman Foods. */
+export type FoodItem = Pick<
+  Food,
+  'id' | 'name' | 'category' | 'imageUrl' | 'calories' | 'proteinG' | 'carbsG' | 'fatG' | 'servingNote'
+>;
+
+export type FoodCategory = FoodItem['category'];
+
+export const FOODS_KEY = ['foods'];
+
+/** Katalog makanan. `query` kosong = semua; `category` undefined = semua kategori ("All"). */
+export function useFoods(query: string, category?: FoodCategory) {
+  const { getToken, isSignedIn } = useAuth();
+
+  return useQuery({
+    queryKey: [...FOODS_KEY, query, category ?? 'all'],
+    enabled: !!isSignedIn,
+    staleTime: 5 * 60_000, // katalog jarang berubah
+    // Tetap tampilkan hasil sebelumnya selama hasil baru dimuat, supaya list tidak berkedip tiap ketik.
+    placeholderData: (previous) => previous,
+    queryFn: async (): Promise<FoodItem[]> => {
+      const params = new URLSearchParams();
+      if (query.trim()) params.set('q', query.trim());
+      if (category) params.set('category', category);
+
+      const response = await fetch(`/api/foods?${params}`, {
+        headers: { Authorization: `Bearer ${await getToken()}` },
+      });
+
+      if (!response.ok) throw new Error(`Could not load foods (${response.status})`);
+      return response.json();
+    },
   });
 }

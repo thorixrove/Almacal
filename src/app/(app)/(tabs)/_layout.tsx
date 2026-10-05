@@ -28,6 +28,7 @@ export default function TabsLayout() {
             tabBar={(props) => <CustomTabBar {...props} />}
         >
             <Tabs.Screen name="home" options={{ title: 'Home' }} />
+            <Tabs.Screen name="food" options={{ title: 'Foods' }} />
             <Tabs.Screen name="camera" options={{ title: 'Scan' }} />
             <Tabs.Screen name="progress" options={{ title: 'Progress' }} />
             <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
@@ -37,6 +38,7 @@ export default function TabsLayout() {
 
 const ICONS: Record<string, keyof typeof MaterialIcons.glyphMap> = {
     home: 'home',
+    food: 'restaurant',
     camera: 'photo-camera',
     progress: 'bar-chart',
     profile: 'person',
@@ -54,7 +56,7 @@ function CustomTabBar({ state, navigation }: any) {
         >
             {state.routes.map((route: any, index: number) => {
                 const focused = state.index === index;
-                const label = route.name.charAt(0).toUpperCase() + route.name.slice(1);
+                const label = route.name === 'food' ? 'Foods' : route.name.charAt(0).toUpperCase() + route.name.slice(1);
 
                 const onPress = () => {
                     if (focused) return;
@@ -66,7 +68,7 @@ function CustomTabBar({ state, navigation }: any) {
                     <Pressable
                         key={route.key}
                         onPress={onPress}
-                        className={`flex-1 items-center justify-center rounded-[50px] py-[10px] ${
+                        className={`flex-1 items-center justify-center rounded-[15px] py-[5px] ${
                             focused ? (isDark ? 'bg-[#3A3A3E]' : 'bg-[#c0c0c0]') : ''
                         }`}
                     >
@@ -76,7 +78,7 @@ function CustomTabBar({ state, navigation }: any) {
                             color={focused ? '#FFFFFF' : isDark ? '#7A7A80' : '#9A9AA0'}
                         />
                         <Text
-                            className={`mt-[2px] text-[10px] ${
+                            className={`mt-[2px] text-[9px] ${
                                 focused ? 'font-semibold text-white' : isDark ? 'text-[#7A7A80]' : 'text-[#9A9AA0]'
                             }`}
                         >

@@ -151,5 +151,48 @@
     "warnFormula": "warn — formula fallback",
     "errorUpload": "error — upload failed",
     "fatalDb": "fatal — db unreachable"
+  },
+  "progress": {
+    "title": "Progress",
+    "tabs": {
+      "weight": "Weight",
+      "calories": "Calories",
+      "macros": "Macros"
+    },
+    "comingSoon": "Coming soon.",
+    "loadError": "Couldn't load your progress",
+    "retry": "Try again",
+    "vsDays": "vs last {{count}} days",
+    "weight": {
+      "title": "Weight Trend",
+      "log": "Log",
+      "empty": "Log your weight at least twice to see the chart."
+    },
+    "consistency": {
+      "title": "Consistency",
+      "hitRate": "Calories hit rate"
+    },
+    "streak": {
+      "title": "Streak Calendar",
+      "days": "{{count}} Day Streak",
+      "weekdays": [
+        "M",
+        "T",
+        "W",
+        "T",
+        "F",
+        "S",
+        "S"
+      ]
+    },
+    "logWeight": {
+      "title": "Log weight",
+      "subtitle": "Enter your weight for today.",
+      "cancel": "Cancel",
+      "save": "Save",
+      "rangeKg": "Enter a weight between {{min}} and {{max}} kg.",
+      "rangeLbs": "Enter a weight between {{min}} and {{max}} lbs.",
+      "saveFailed": "Couldn't save. {{message}}"
+    }
   }
 }

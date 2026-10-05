@@ -1441,7 +1441,8 @@ __export(schema_exports, {
   meals: () => meals,
   themePreferenceEnum: () => themePreferenceEnum,
   unitPreferenceEnum: () => unitPreferenceEnum,
-  users: () => users
+  users: () => users,
+  weightLogs: () => weightLogs
 });
 init_esm();
 
@@ -7541,6 +7542,18 @@ var meals = pgTable(
   },
   (t) => [index("meals_user_logged_at_idx").on(t.userId, t.loggedAt.desc())]
 );
+var weightLogs = pgTable(
+  "weight_logs",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    userId: uuid().notNull().references(() => users.id, { onDelete: "cascade" }),
+    weightKg: numeric({ mode: "number" }).notNull(),
+    loggedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    // UTC instant
+    ...timestamps
+  },
+  (t) => [index("weight_logs_user_logged_at_idx").on(t.userId, t.loggedAt.desc())]
+);
 
 // src/db/index.ts
 init_esm();
@@ -13412,4 +13425,4 @@ export {
      *)
   *)
 */
-//# sourceMappingURL=chunk-2SXWOCLK.mjs.map
+//# sourceMappingURL=chunk-EKOM5GVH.mjs.map

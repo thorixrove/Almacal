@@ -151,5 +151,48 @@
     "warnFormula": "warn — fallback formula",
     "errorUpload": "error — upload gagal",
     "fatalDb": "fatal — database tidak dapat dijangkau"
+  },
+  "progress": {
+    "title": "Progres",
+    "tabs": {
+      "weight": "Berat",
+      "calories": "Kalori",
+      "macros": "Makro"
+    },
+    "comingSoon": "Segera hadir.",
+    "loadError": "Gagal memuat progres Anda",
+    "retry": "Coba lagi",
+    "vsDays": "dibanding {{count}} hari terakhir",
+    "weight": {
+      "title": "Tren Berat",
+      "log": "Catat",
+      "empty": "Catat berat badan minimal 2 kali untuk melihat grafik."
+    },
+    "consistency": {
+      "title": "Konsistensi",
+      "hitRate": "Target kalori tercapai"
+    },
+    "streak": {
+      "title": "Kalender Streak",
+      "days": "Streak {{count}} Hari",
+      "weekdays": [
+        "S",
+        "S",
+        "R",
+        "K",
+        "J",
+        "S",
+        "M"
+      ]
+    },
+    "logWeight": {
+      "title": "Catat berat",
+      "subtitle": "Masukkan berat badan Anda hari ini.",
+      "cancel": "Batal",
+      "save": "Simpan",
+      "rangeKg": "Masukkan berat antara {{min}} dan {{max}} kg.",
+      "rangeLbs": "Masukkan berat antara {{min}} dan {{max}} lbs.",
+      "saveFailed": "Gagal menyimpan. {{message}}"
+    }
   }
 }

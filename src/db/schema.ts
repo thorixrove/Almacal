@@ -75,7 +75,25 @@ export const meals = pgTable(
   (t) => [index("meals_user_logged_at_idx").on(t.userId, t.loggedAt.desc())],
 );
 
+// One row per weigh-in. users.weightKg stays as the "current" value; this table is the history
+// that powers the Progress > Weight chart.
+export const weightLogs = pgTable(
+  "weight_logs",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    userId: uuid()
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    weightKg: numeric({ mode: "number" }).notNull(),
+    loggedAt: timestamp({ withTimezone: true }).notNull().defaultNow(), // UTC instant
+    ...timestamps,
+  },
+  (t) => [index("weight_logs_user_logged_at_idx").on(t.userId, t.loggedAt.desc())],
+);
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Meal = typeof meals.$inferSelect;
 export type NewMeal = typeof meals.$inferInsert;
+export type WeightLog = typeof weightLogs.$inferSelect;
+export type NewWeightLog = typeof weightLogs.$inferInsert;

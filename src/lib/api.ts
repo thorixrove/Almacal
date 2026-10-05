@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 // Type-only: the schema file pulls in zod, which the app bundle doesn't need.
 import type { Plan, PlanInput } from '@/lib/plan';
 import type { Meal, User } from '@/db/schema';
+import type { ProgressResponse } from '@/app/api/progress+api';
 import { answers, draft } from '@/onboarding/steps';
 
 /**
@@ -202,6 +203,61 @@ export function useMeals(date: string) {
     // Polling only while that's true beats a Realtime subscription per card.
     refetchInterval: (query) =>
       query.state.data?.some((meal) => meal.status === 'analyzing') ? 3000 : false,
+  });
+}
+
+
+export type Progress = ProgressResponse;
+
+export const PROGRESS_KEY = ['progress'];
+
+/** Riwayat berat, konsistensi kalori, dan tanggal log untuk halaman Progress. */
+export function useProgress(days = 30) {
+  const { getToken, isSignedIn } = useAuth();
+
+  return useQuery({
+    queryKey: [...PROGRESS_KEY, days],
+    enabled: !!isSignedIn,
+    staleTime: 30_000,
+    queryFn: async (): Promise<Progress> => {
+      const response = await fetch(`/api/progress?days=${days}`, {
+        headers: { Authorization: `Bearer ${await getToken()}` },
+      });
+
+      if (!response.ok) throw new Error(`Could not load your progress (${response.status})`);
+      return response.json();
+    },
+  });
+}
+
+/** Satu penimbangan, seperti yang dikembalikan POST /api/weight. */
+export type LoggedWeight = { id: string; weightKg: number; loggedAt: string };
+
+/** Catat berat badan (selalu dalam kg). Konversi dari lbs dilakukan sebelum memanggil ini. */
+export function useLogWeight() {
+  const { getToken } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (weightKg: number): Promise<LoggedWeight> => {
+      const response = await fetch('/api/weight', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${await getToken()}`,
+        },
+        body: JSON.stringify({ weightKg }),
+      });
+
+      if (!response.ok) throw new Error(`Could not log your weight (${response.status})`);
+      return response.json();
+    },
+    // Grafik berat dan berat "saat ini" di profil sama-sama berubah.
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: PROGRESS_KEY });
+      queryClient.invalidateQueries({ queryKey: PROFILE_KEY });
+    },
+    onError: (error) => Sentry.logger.error('Weight log failed', { reason: String(error) }),
   });
 }
 

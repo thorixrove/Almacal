@@ -4,7 +4,9 @@ import * as Linking from 'expo-linking';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SymbolView } from 'expo-symbols';
+import { useColorScheme } from 'nativewind';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Platform, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -17,8 +19,11 @@ let navigated = false;
 export default function SignIn() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
   const { startSSOFlow } = useSSO();
   const { isSignedIn } = useAuth();
+  const { t } = useTranslation();
   const [busy, setBusy] = useState<Provider | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -61,11 +66,11 @@ export default function SignIn() {
         return;
       }
       if (signUp?.status === 'missing_requirements') {
-        setError('Your account needs a few more details. Please try the other provider.');
+        setError(t('auth.errorMissingRequirements'));
       }
       // otherwise the sheet was dismissed — stay put, say nothing
     } catch (err) {
-      setError('Something went wrong. Please try again.');
+      setError(t('auth.errorGeneric'));
       console.error('SSO error:', JSON.stringify(err, null, 2));
     } finally {
       if (!keepBusy) setBusy(null);
@@ -74,13 +79,13 @@ export default function SignIn() {
 
   return (
     <View
-      className="flex-1 bg-[#FEFDFD]"
+      className={`flex-1 ${isDark ? 'bg-[#0B0B0C]' : 'bg-[#FEFDFD]'}`}
       style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}>
-      <StatusBar style="dark" />
+      <StatusBar style={isDark ? 'light' : 'dark'} />
 
       <View className="mt-[4px] h-[24px] flex-row items-center px-[26px]">
         <Pressable onPress={() => router.back()} hitSlop={12}>
-          <SymbolView name="arrow.left" size={22} weight="medium" tintColor="#000000" />
+          <SymbolView name="arrow.left" size={22} weight="medium" tintColor={isDark ? '#FFFFFF' : '#000000'} />
         </Pressable>
       </View>
 
@@ -90,11 +95,11 @@ export default function SignIn() {
           style={{ width: 62, height: 72 }}
           contentFit="contain"
         />
-        <Text className="mt-[26px] text-center text-[32px] font-bold leading-[38px] text-black">
-          Welcome to AlmaCal
+        <Text className={`mt-[26px] text-center text-[32px] font-bold leading-[38px] ${isDark ? 'text-white' : 'text-black'}`}>
+          {t('auth.welcome')}
         </Text>
-        <Text className="mt-[8px] w-[290px] text-center text-[17px] leading-[23px] text-[#4A4A52]">
-          Sign in to build your personal calorie plan and keep your progress on every device.
+        <Text className={`mt-[8px] w-[290px] text-center text-[17px] leading-[23px] ${isDark ? 'text-[#B2B2B7]' : 'text-[#4A4A52]'}`}>
+          {t('auth.subtitle')}
         </Text>
       </View>
 
@@ -112,7 +117,7 @@ export default function SignIn() {
               <>
                 <SymbolView name="apple.logo" size={19} tintColor="#FFFFFF" />
                 <Text className="ml-[10px] text-[17px] font-semibold text-white">
-                  Continue with Apple
+                  {t('auth.continueApple')}
                 </Text>
               </>
             )}
@@ -122,11 +127,11 @@ export default function SignIn() {
         <Pressable
           onPress={() => signInWith('oauth_google')}
           disabled={busy !== null}
-          className={`mt-[12px] h-[52px] flex-row items-center justify-center rounded-[15px] border border-[#DEDEE2] bg-white ${
+          className={`mt-[12px] h-[52px] flex-row items-center justify-center rounded-[15px] border ${isDark ? 'border-[#3A3A3C] bg-[#1C1C1E]' : 'border-[#DEDEE2] bg-white'} ${
             busy ? 'opacity-60' : 'active:opacity-90'
           }`}>
           {busy === 'oauth_google' ? (
-            <ActivityIndicator color="#000000" />
+            <ActivityIndicator color={isDark ? '#FFFFFF' : '#000000'} />
           ) : (
             <>
               <Image
@@ -134,8 +139,8 @@ export default function SignIn() {
                 style={{ width: 19, height: 19 }}
                 contentFit="contain"
               />
-              <Text className="ml-[10px] text-[17px] font-semibold text-black">
-                Continue with Google
+              <Text className={`ml-[10px] text-[17px] font-semibold ${isDark ? 'text-white' : 'text-black'}`}>
+                {t('auth.continueGoogle')}
               </Text>
             </>
           )}
@@ -148,7 +153,7 @@ export default function SignIn() {
         ) : null}
 
         <Text className="mb-[6px] mt-[16px] text-center text-[12px] leading-[17px] text-[#8A8A90]">
-          By continuing you agree to our Terms of Service and Privacy Policy.
+          {t('auth.terms')}
         </Text>
       </View>
     </View>

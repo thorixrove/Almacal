@@ -104,12 +104,12 @@ export default function profile() {
 
     const confirmSignOut = () =>
       Alert.alert(
-        'Sign out?',
-        'You can sign back in anytime.',
+        t('profile.signOutTitle'),
+        t('profile.signOutMessage'),
         [
-          { text: 'No', style: 'cancel'},
+          { text: t('common.no'), style: 'cancel'},
           {
-            text: 'Yes',
+            text: t('common.yes'),
             style: 'destructive',
             onPress: async () => {
               try {
@@ -118,7 +118,7 @@ export default function profile() {
                 queryClient.clear()
               } catch (error) {
                 Sentry.logger.error('Sign out failed', { reason: String(error) })
-                Alert.alert('Sign out failed', 'Please try again.')
+                Alert.alert(t('profile.signOutFailed'), t('profile.signOutFailedMessage'))
               }
             },
           },
@@ -127,12 +127,12 @@ export default function profile() {
 
   const confirmDelete = () =>
     Alert.alert(
-      'Delete your account?',
-      'This permanently removes your profile, your targets and every meal you have logged. It cannot be undone.',
+      t('profile.deleteAccountTitle'),
+      t('profile.deleteAccountMessage'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Delete',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -141,7 +141,7 @@ export default function profile() {
               await signOut().catch(() => { })
             } catch (error) {
               Sentry.logger.error('Account deletion failed', { reason: String(error) })
-              Alert.alert('We couldn’t delete your account', 'Please try again in a moment.')
+              Alert.alert(t('profile.deleteAccountFailed'), t('profile.deleteAccountFailedMessage'))
             }
           },
         },
@@ -172,10 +172,10 @@ export default function profile() {
           )}
           <View className="ml-[14px] flex-1">
             <Text numberOfLines={1} className="text-[20px] font-bold text-black dark:text-white">
-              {user?.fullName ?? user?.firstName ?? 'Your Profile'}
+              {user?.fullName ?? user?.firstName ?? t('profile.yourProfile')}
             </Text>
             <Text numberOfLines={1} className="mt-[2px] text-[15px] text-[#8A8A90] dark:text-[#9A9AA0]">
-              {user?.primaryEmailAddress?.emailAddress ?? 'Signed in'}
+              {user?.primaryEmailAddress?.emailAddress ?? t('profile.signedIn')}
             </Text>
           </View>
         </View>
@@ -211,7 +211,7 @@ export default function profile() {
           <Row
             divider
             icon='bug'
-            label='Sentry test bench'
+            label={t('profile.sentryTestBench')}
             onPress={() => router.push('/debug-sentry')}
           />
         </Card>

@@ -2,14 +2,15 @@ import { useAuth } from "@clerk/expo";
 import { Image } from "expo-image";
 import { Redirect, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
 
 export default function WelcomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { isLoaded, isSignedIn } = useAuth();
+  const { t } = useTranslation();
 
   if (isLoaded && isSignedIn) return <Redirect href="/home" />;
 
@@ -39,14 +40,14 @@ export default function WelcomeScreen() {
 
       <View className="items-center px-[26px]">
         <Text className="mt-[14px] w-[265px] text-center text-[32px] font-bold leading-[37px] tracking-[-0.4px] text-black">
-          Calorie tracking made easy
+          {t("welcome.title")}
         </Text>
 
         <Pressable
           onPress={() => router.push("/sign-in")}
           className="mt-[17px] h-[48px] w-full flex-row items-center justify-center rounded-full bg-black active:opacity-90"
         >
-          <Text className="text-[16px] font-bold tracking-[-0.4px] text-white">Get Started</Text>
+          <Text className="text-[16px] font-bold tracking-[-0.4px] text-white">{t("welcome.getStarted")}</Text>
           <Text
             className="absolute text-white"
             style={{

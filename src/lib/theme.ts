@@ -14,7 +14,7 @@ const STORAGE_KEY = 'theme-preference';
  */
 export async function loadThemePreference(): Promise<ThemePreference> {
   const value = await SecureStore.getItemAsync(STORAGE_KEY);
-  return value === 'light' || value === 'dark' ? value : 'system';
+  return value === 'light' || value === 'dark' ? value : 'light';
 }
 
 export async function saveThemePreference(value: ThemePreference): Promise<void> {

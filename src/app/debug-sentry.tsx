@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { SymbolView, type SFSymbol } from 'expo-symbols';
 import { useColorScheme } from 'nativewind';
 import { useState, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -113,23 +114,20 @@ function captureCameraWarning() {
 
 // ------------------------------------------------------------------- logs
 
-const LOGS: { label: string; run: () => void }[] = [
+const LOGS_TEMPLATES = [
+  { key: 'debugSentry.traceCache', run: () => Sentry.logger.trace('Profile cache hit', { key: 'profile', age_ms: 412 }) },
   {
-    label: 'trace — cache read',
-    run: () => Sentry.logger.trace('Profile cache hit', { key: 'profile', age_ms: 412 }),
-  },
-  {
-    label: 'debug — camera frame',
+    key: 'debugSentry.debugCamera',
     run: () =>
       Sentry.logger.debug('Captured frame compressed', { width: 1024, quality: 0.8, bytes: 184302 }),
   },
   {
-    label: 'info — meal logged',
+    key: 'debugSentry.infoMeal',
     run: () =>
       Sentry.logger.info('Meal logged', { calories: 642, protein_g: 38, source: 'camera' }),
   },
   {
-    label: 'warn — formula fallback',
+    key: 'debugSentry.warnFormula',
     run: () =>
       Sentry.logger.warn('Plan fell back to Mifflin-St Jeor', {
         reason: 'model_returned_implausible_plan',
@@ -137,7 +135,7 @@ const LOGS: { label: string; run: () => void }[] = [
       }),
   },
   {
-    label: 'error — upload failed',
+    key: 'debugSentry.errorUpload',
     run: () =>
       Sentry.logger.error('Meal upload failed', {
         reason: 'HTTP 502 from /api/meals',
@@ -145,7 +143,7 @@ const LOGS: { label: string; run: () => void }[] = [
       }),
   },
   {
-    label: 'fatal — db unreachable',
+    key: 'debugSentry.fatalDb',
     run: () =>
       Sentry.logger.fatal('Database unreachable, every write is failing', {
         db: 'neon-primary',
@@ -227,6 +225,9 @@ export default function DebugSentry() {
   const insets = useSafeAreaInsets();
   const [crash, setCrash] = useState(false);
   const { colorScheme } = useColorScheme();
+  const { t } = useTranslation();
+
+  const LOGS = LOGS_TEMPLATES.map((log) => ({ ...log, label: t(log.key) }));
 
   if (crash) crashInRender();
 
@@ -238,95 +239,97 @@ export default function DebugSentry() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}>
         <View className="mt-[10px] flex-row items-center px-[22px]">
-          <Text className="flex-1 text-[34px] font-bold tracking-[-0.8px] text-black dark:text-white">Sentry</Text>
+          <Text className="flex-1 text-[34px] font-bold tracking-[-0.8px] text-black dark:text-white">
+            {t('debugSentry.title')}
+          </Text>
           <Pressable onPress={() => router.back()} hitSlop={12}>
-            <Text className="text-[17px] text-[#8A8A90] dark:text-[#9A9AA0]">Close</Text>
+            <Text className="text-[17px] text-[#8A8A90] dark:text-[#9A9AA0]">{t('debugSentry.close')}</Text>
           </Pressable>
         </View>
         <Text className="mt-[4px] px-[22px] text-[15px] text-[#8A8A90] dark:text-[#9A9AA0]">
-          Every button below sends something real to the dashboard.
+          {t('debugSentry.description')}
         </Text>
 
-        <SectionTitle>Crashes</SectionTitle>
+        <SectionTitle>{t('debugSentry.crashes')}</SectionTitle>
         <Card>
           <Row
             icon="exclamationmark.triangle"
-            label="Uncaught error in render"
+            label={t('debugSentry.uncaughtRender')}
             tint="#E5484D"
             onPress={() => setCrash(true)}
           />
           <Row
             divider
             icon="hand.tap"
-            label="Uncaught error in a handler"
+            label={t('debugSentry.uncaughtHandler')}
             tint="#E5484D"
             onPress={uncaughtHandlerError}
           />
           <Row
             divider
             icon="arrow.triangle.2.circlepath"
-            label="Unhandled promise rejection"
+            label={t('debugSentry.unhandledRejection')}
             tint="#E5484D"
             onPress={unhandledRejection}
           />
           <Row
             divider
             icon="bolt.trianglebadge.exclamationmark"
-            label="Native crash"
+            label={t('debugSentry.nativeCrash')}
             tint="#E5484D"
             onPress={nativeCrash}
           />
         </Card>
 
-        <SectionTitle>Handled errors</SectionTitle>
+        <SectionTitle>{t('debugSentry.handledErrors')}</SectionTitle>
         <Card>
-          <Row icon="fork.knife" label="Meal analysis failed" onPress={captureMealFailure} />
-          <Row divider icon="creditcard" label="Purchase declined" onPress={capturePurchaseFailure} />
-          <Row divider icon="wifi.slash" label="Network request failed" onPress={captureNetworkFailure} />
-          <Row divider icon="camera" label="Camera permission denied" onPress={captureCameraWarning} />
+          <Row icon="fork.knife" label={t('debugSentry.mealAnalysisFailed')} onPress={captureMealFailure} />
+          <Row divider icon="creditcard" label={t('debugSentry.purchaseDeclined')} onPress={capturePurchaseFailure} />
+          <Row divider icon="wifi.slash" label={t('debugSentry.networkRequestFailed')} onPress={captureNetworkFailure} />
+          <Row divider icon="camera" label={t('debugSentry.cameraPermissionDenied')} onPress={captureCameraWarning} />
         </Card>
 
-        <SectionTitle>Logs</SectionTitle>
+        <SectionTitle>{t('debugSentry.logs')}</SectionTitle>
         <Card>
           {LOGS.map((log, index) => (
             <Row
-              key={log.label}
+              key={log.key}
               divider={index > 0}
               icon="text.alignleft"
               label={log.label}
               onPress={() => {
                 log.run();
-                toast(log.label);
+                toast(t('debugSentry.sentToSentry'));
               }}
             />
           ))}
         </Card>
 
-        <SectionTitle>Performance</SectionTitle>
+        <SectionTitle>{t('debugSentry.performance')}</SectionTitle>
         <Card>
-          <Row icon="timer" label="Slow meal analysis trace" onPress={tracedMealAnalysis} />
-          <Row divider icon="xmark.octagon" label="Span that fails" onPress={tracedFailingSpan} />
+          <Row icon="timer" label={t('debugSentry.slowMealAnalysis')} onPress={tracedMealAnalysis} />
+          <Row divider icon="xmark.octagon" label={t('debugSentry.spanFails')} onPress={tracedFailingSpan} />
         </Card>
 
-        <SectionTitle>Other</SectionTitle>
+        <SectionTitle>{t('debugSentry.other')}</SectionTitle>
         <Card>
           <Row
             icon="mappin.and.ellipse"
-            label="Add breadcrumbs only"
+            label={t('debugSentry.addBreadcrumbsOnly')}
             onPress={() => {
               Sentry.addBreadcrumb({ category: 'ui', message: 'Opened camera', level: 'info' });
               Sentry.addBreadcrumb({ category: 'ui', message: 'Retook photo', level: 'info' });
-              toast('Breadcrumbs attached to the next event');
+              toast(t('debugSentry.sentToSentry'));
             }}
           />
           {/* the feedback widget lives on Profile — it's a real feature, not a test */}
           <Row
             divider
             icon="paperplane"
-            label="Flush queued events now"
+            label={t('debugSentry.flushQueued')}
             onPress={async () => {
               await Sentry.flush();
-              toast('Queue flushed');
+              toast(t('debugSentry.sentToSentry'));
             }}
           />
         </Card>

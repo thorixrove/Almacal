@@ -44,3 +44,4 @@ example
 /android
 
 .env.local
+.trigger/

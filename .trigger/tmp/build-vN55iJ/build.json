@@ -1,0 +1,128 @@
+{
+  "build": {
+  },
+  "cliPackageVersion": "4.7.3",
+  "config": {
+    "dirs": [
+      "./src/trigger"
+    ],
+    "project": "proj_olganbbrvennpqcompwx"
+  },
+  "configPath": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-vN55iJ\\OneDrive\\Desktop\\almacal\\trigger.config.mjs",
+  "contentHash": "262d6b05d2dca4838871a39e85e531e0",
+  "customConditions": [
+  ],
+  "deploy": {
+    "env": {
+    }
+  },
+  "environment": "dev",
+  "externals": [
+    {
+      "name": "import-in-the-middle",
+      "version": "3.0.1"
+    }
+  ],
+  "files": [
+    {
+      "entry": "src/trigger/analyze-meal.ts",
+      "out": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-vN55iJ\\OneDrive\\Desktop\\almacal\\src\\trigger\\analyze-meal.mjs"
+    },
+    {
+      "entry": "src/trigger/clerk-users.ts",
+      "out": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-vN55iJ\\OneDrive\\Desktop\\almacal\\src\\trigger\\clerk-users.mjs"
+    },
+    {
+      "entry": "src/trigger/generate-plan.ts",
+      "out": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-vN55iJ\\OneDrive\\Desktop\\almacal\\src\\trigger\\generate-plan.mjs"
+    }
+  ],
+  "indexWorkerEntryPoint": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-vN55iJ\\AppData\\Local\\npm-cache\\_npx\\f51a09bd0abf5f10\\node_modules\\trigger.dev\\dist\\esm\\entryPoints\\dev-index-worker.mjs",
+  "otelImportHook": {
+    "include": [
+    ]
+  },
+  "outputHashes": {
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\AppData\\Local\\npm-cache\\_npx\\f51a09bd0abf5f10\\node_modules\\trigger.dev\\dist\\esm\\entryPoints\\dev-index-worker.mjs": "PoFro7fpZyc",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\AppData\\Local\\npm-cache\\_npx\\f51a09bd0abf5f10\\node_modules\\trigger.dev\\dist\\esm\\entryPoints\\dev-index-worker.mjs.map": "shI83TwNZfY",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\AppData\\Local\\npm-cache\\_npx\\f51a09bd0abf5f10\\node_modules\\trigger.dev\\dist\\esm\\entryPoints\\dev-run-worker.mjs": "iEH7rquq7tQ",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\AppData\\Local\\npm-cache\\_npx\\f51a09bd0abf5f10\\node_modules\\trigger.dev\\dist\\esm\\entryPoints\\dev-run-worker.mjs.map": "XXpKpAIDtDY",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\OneDrive\\Desktop\\almacal\\src\\trigger\\analyze-meal.mjs": "V0NGUOMsc9w",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\OneDrive\\Desktop\\almacal\\src\\trigger\\analyze-meal.mjs.map": "UrFxvBjSHFI",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\OneDrive\\Desktop\\almacal\\src\\trigger\\clerk-users.mjs": "6RDummlLDaY",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\OneDrive\\Desktop\\almacal\\src\\trigger\\clerk-users.mjs.map": "6Sh07THlhwA",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\OneDrive\\Desktop\\almacal\\src\\trigger\\generate-plan.mjs": "E12+L/00P7A",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\OneDrive\\Desktop\\almacal\\src\\trigger\\generate-plan.mjs.map": "DkYvmmopDWA",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\OneDrive\\Desktop\\almacal\\trigger.config.mjs": "3d698xuHS58",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\OneDrive\\Desktop\\almacal\\trigger.config.mjs.map": "nwVOZVVOCjU",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\chunk-6DWI2BR5.mjs": "EM2KOQRqDHE",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\chunk-6DWI2BR5.mjs.map": "T5NV/B2hU2Y",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\chunk-ARVRABRY.mjs": "Hmne5vZ1z90",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\chunk-ARVRABRY.mjs.map": "WidtqPRfmi4",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\chunk-B4STED5M.mjs": "4wUBNZGI7gM",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\chunk-B4STED5M.mjs.map": "04faNT0TaLs",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\chunk-CEGEFIIW.mjs": "XTqnaKCt0CY",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\chunk-CEGEFIIW.mjs.map": "PUF4XWPqW4k",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\chunk-IKSFYADO.mjs": "uZJTjHU/Foc",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\chunk-IKSFYADO.mjs.map": "U2G6A4vSHIk",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\chunk-KCA5ZLIZ.mjs": "h9sjVOoR/ww",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\chunk-KCA5ZLIZ.mjs.map": "4JuF17zNaFQ",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\chunk-NLUCP7AA.mjs": "J6tfImNMIJU",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\chunk-NLUCP7AA.mjs.map": "mhJfYUdmu6Q",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\chunk-ZQK7JG23.mjs": "stajMZcmago",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\chunk-ZQK7JG23.mjs.map": "QFT2p/9oekE",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\crypto.node-2DVSRIHS.mjs": "CHXByb7M+P8",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\crypto.node-2DVSRIHS.mjs.map": "LMPzUuAiOIM",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\crypto.node-SZRERSH4.mjs": "ufA+r6+wUSQ",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\crypto.node-SZRERSH4.mjs.map": "CR4+ROUCPXo",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\esm-B7IWAJH2.mjs": "laMN6RtRJ2k",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\esm-B7IWAJH2.mjs.map": "VON93E1In1A",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\esm-FBB3BYPS.mjs": "hVD49RBOaK0",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\esm-FBB3BYPS.mjs.map": "n/kSTyRRA5k",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\getMachineId-bsd-J3NMSZL3.mjs": "Sgf8QRffLow",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\getMachineId-bsd-J3NMSZL3.mjs.map": "gTCzlASL4Kw",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\getMachineId-darwin-OSSW5EO5.mjs": "o4Vb5GNepvk",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\getMachineId-darwin-OSSW5EO5.mjs.map": "a9y0+3Yy8jA",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\getMachineId-linux-QVOBCV3W.mjs": "K1RgbsVcLUA",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\getMachineId-linux-QVOBCV3W.mjs.map": "Ly8Re+HGXE4",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\getMachineId-unsupported-6ROMR6GR.mjs": "DczXO3EHAhs",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\getMachineId-unsupported-6ROMR6GR.mjs.map": "8FWUHQytmNM",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\getMachineId-win-S7FIGOBP.mjs": "/uUpRvSArgw",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\getMachineId-win-S7FIGOBP.mjs.map": "/wDXUlRPAys",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\s2s-GQ5NU26O.mjs": "qnfCpwtzb/w",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\s2s-GQ5NU26O.mjs.map": "WfCAHQbJimc",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\s2s-P2AJW6ZD.mjs": "Q6VbMXFe6ao",
+    "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-8o5L2C\\s2s-P2AJW6ZD.mjs.map": "tSRcM/3+6NM"
+  },
+  "outputPath": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-vN55iJ",
+  "packageVersion": "4.7.3",
+  "runWorkerEntryPoint": "C:\\Users\\Asus\\OneDrive\\Desktop\\almacal\\.trigger\\tmp\\build-vN55iJ\\AppData\\Local\\npm-cache\\_npx\\f51a09bd0abf5f10\\node_modules\\trigger.dev\\dist\\esm\\entryPoints\\dev-run-worker.mjs",
+  "runtime": "node-24",
+  "sources": {
+    "package.json": {
+      "contentHash": "71dc8f6fa8ed71303e9d7ff584dc44e1",
+      "contents": "eJx1lUtyozAQhvepyh0or0fC4FfiVRZzjlQ1qG0rgMSoBY6Typx9SgKMYMyS/j+1Wv3i+/kpilYKKlwdoxWUFeRQrn55awVSOSt+1poZ3Vg0MSprbr3eoiGpPZLwNV/3ZoE1KoEql0irY/TtjFG0estLNEWcQV6gEu7Q+4YnB552x0bCXeflLd/z/ag6e9xIJ/3dHfiaJy+jqFArARYyIIwJTYumRCLvJ+HJEJxDDUJumQIrW2S5rqpGSXuLBVi0ssJa5gUad/B1eo782+PwuHf/wtN9yFlQZCEvevJPg+bmwR1P1ikPgrZGns9ouMC2hy9aFz7oLd/xZP8YJVE8QISRX18lMm0qf9uab3dBcoesdqlLpwKDxl4YIQ317BM8o3Ko0MCo72aydg9Xlh6WyCMCW5ljEMdUPmllR3E7Fc8lEDE8nTAPoM0UkhWccTFCr7Kxwn2QhylVSlVIdQ6A9RToZiF4RTLVCfPGICOrDS4+h+oS6MIoN4hBzl9nlAXbEMsgjHeG3KpMl7SYErqRxYqFkzML5YoZy4y+Uvio0UvX61fZT+2Wp8FY6hoVeNfvB57sgkHwHe2XwytPA3ddpwtdLWrjcK35y35BZmck69J8ASXKPvKUb9J5CANvEJSswKK4T89jkOCEDAyC62iLn3238cOS566GXQW2020w4a6YecZ1zCKjTVFiN0Ou84IgqZWfPtEpD/P8pYdtmu74Yb9y5p9hFbe/F7ZxuFCyRpbiwUp5s7caKb4X8q+vVvrfyimk7VfOJgmHxYIsXdvk/SLe8C1Pxgb33nMj68753jddEH2nhVGTBWOHX1LUfY1ZJLSsNvqj3w9KC4x43HuJJzr/oPtBUMJoKe5uTaOOg21gpKaJ7r4Hra/qGFLEfKUHvZRqjNl/3POXHc+o0ID1zR6kM7rbA7aS50foYA7IuqHLHPO2gCHbCKnnVG8NqlAb2Xa3WtPg89PP89M/6T80ZQ=="
+    },
+    "src/trigger/analyze-meal.ts": {
+      "contentHash": "1a8ab387464441e8eb6c2cfe1e2dfd57",
+      "contents": "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"
+    },
+    "src/trigger/clerk-users.ts": {
+      "contentHash": "999a6d355fd030b4dc004b870cbb254f",
+      "contents": "eJydVMtu2zAQvOsrBkKByoAi32W4SBAngNEHijxORdHQ4kYmQpM2SdlxXAH9iH5hv6SgKMlOmqRob9Tu7M7OrEixWGrjsINj9g41bo1eID52RpQlmYzTemj5XTyKRAekVQq7kj2WG/HwIOlIm0U8iqLhEBckmRNrSqG0Q3w85LMYv378hJuTpYbJghnCrFJcEsdsi6s9YSj7SM7obE/LZykqS8b2xFnmG4+iyG2XhMutKq4tmc9sKzXjGGOHQpK588Epz2GdEaocgRZMyO4T36EqKVGPoui2UoUTWqFaWjLO1yWPeqShFnX+lG2AXQQYcpVR4LMIADKhfJukGXoQQmsmK7IvdG0xWp1qdStF4Sb6esmZo2TXZADHTEkuDz5khz1agPXZDo1e6kreFJpJsgUldF/IihPPmmSKN7vQrfmsBzdpX1015PzE5VC0wcRPMujSdTh0QwfpQpXJDoJ3EwqOejCK6iii+2aNhVbW7cWfGvIMGDf/RCPTF8cN4Mj3OCoCJPZ0plI5mN2qAskyGP/MJsbvWgec2fZeBOIvvuVXjME2TLjDPbftBqMW365y1wiZtoIaPQFRo2CumCMhY3IwtR08otKSMjJGmySefro8u7jC+cn0w9kkj1OQMdmCrGUl9XRPak5Pri/POmzBKrtHurnRGx9v54iaVXiXn7c4/EGvWtzu+X8s/jdbXze1lfGCjglJ+osOHiAv63j2QUB9oGc4xNWchMGCmLQoNZzWKdaC+bcrRDNP9k1wnL9/a6FVmMyPwmzBOMXZgTW8Hzt4074NQBYyh68DkG3mZCihVfLnDUcr4zA46AtfvX+PzW9HyrtDJkmVbn64hN8SPvTM"
+    },
+    "src/trigger/generate-plan.ts": {
+      "contentHash": "9b14978be28d35599540128d47529425",
+      "contents": "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"
+    },
+    "trigger.config.ts": {
+      "contentHash": "330d7584158b87e70c64aedfa2e470bb",
+      "contents": "eJxlj0FLw0AQhe/5FY+cFEITFTxsL4q99OCtNxHZZCdxbXY2zk5qoeS/S0pKEU8zfG/e440PQxTFCY5az/QSufUdJrQSA/InFd91JCtHhzK5fb7OMjqeHY5aO/b6x3dzyoBB4hc1apDP20fsO8t1LQdiHr6bGIafY16gLNFZVg9H3Fm+uLDdYG/DCGfFw9n0WUcrDrtrjwxwXpLBW74qkzTl0jF/LzIg2ONmFKs+ssFjNSMhFU/JYG4HENu6J7flDR0MVEYqznx56HJ2jnpWpTBoMngoFtraRqMY3F9A8LzzgeKoW35NBndVVRXXiH/aIk7zmIpsul3/AuHdenM="
+    },
+    "tsconfig.json": {
+      "contentHash": "fe70175f872f6a9ae0062919e2c07213",
+      "contents": "eJxlj0sOwjAMRPc9heVlVJJ9V9yAAyAWJTEQqaRRbUpR1buj9MtnZc/4jTTuMwCkTig4xiKtsTbCtg4Xf9XnkgnzhNj6Hn1FzSGKr0NC+wwAAFkabwULkOZB+eTFUm4bAoB7o7CA4ywBUBturFE4O6d8I0tmEv4PrP6SGeeQAQxjQx9s9XC0xlApo7Qw5l+yW7SeXn1FYvODpsuOQqvdhxlK8S09fXDbKUs1hjesh1FA"
+    }
+  },
+  "target": "dev"
+}

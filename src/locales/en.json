@@ -193,6 +193,25 @@
       "rangeKg": "Enter a weight between {{min}} and {{max}} kg.",
       "rangeLbs": "Enter a weight between {{min}} and {{max}} lbs.",
       "saveFailed": "Couldn't save. {{message}}"
+    },
+    "calories": {
+      "title": "Daily Calories",
+      "avg": "avg per day · last {{count}} days",
+      "empty": "Log your meals to see your daily calories.",
+      "target": "Target: {{value}} kcal",
+      "onTarget": "{{hit}}/{{tracked}} days on target"
+    },
+    "macros": {
+      "title": "Macros",
+      "avg": "avg per day · last {{count}} days",
+      "empty": "Log your meals to see your macros.",
+      "names": {
+        "protein": "Protein",
+        "carbs": "Carbs",
+        "fat": "Fat"
+      },
+      "value": "{{avg}} / {{target}} g",
+      "valueNoTarget": "{{avg}} g"
     }
   }
 }

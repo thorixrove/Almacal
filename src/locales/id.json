@@ -193,6 +193,25 @@
       "rangeKg": "Masukkan berat antara {{min}} dan {{max}} kg.",
       "rangeLbs": "Masukkan berat antara {{min}} dan {{max}} lbs.",
       "saveFailed": "Gagal menyimpan. {{message}}"
+    },
+    "calories": {
+      "title": "Kalori Harian",
+      "avg": "rata-rata per hari · {{count}} hari terakhir",
+      "empty": "Catat makanan Anda untuk melihat kalori harian.",
+      "target": "Target: {{value}} kkal",
+      "onTarget": "{{hit}}/{{tracked}} hari sesuai target"
+    },
+    "macros": {
+      "title": "Makro",
+      "avg": "rata-rata per hari · {{count}} hari terakhir",
+      "empty": "Catat makanan Anda untuk melihat makro.",
+      "names": {
+        "protein": "Protein",
+        "carbs": "Karbohidrat",
+        "fat": "Lemak"
+      },
+      "value": "{{avg}} / {{target}} g",
+      "valueNoTarget": "{{avg}} g"
     }
   }
 }

@@ -4,103 +4,101 @@ import * as Linking from 'expo-linking';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SymbolView } from 'expo-symbols';
-import { useColorScheme } from 'nativewind';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-type Provider = 'oauth_apple' | 'oauth_google';
+import { useSaveProfile } from '@/lib/api';
+import { draft } from '@/onboarding/steps';
 
-// router.replace('/home') sebelumnya terpanggil 2-5x per login. Flag di level modul ini
-// memastikan navigasi cuma sekali sampai user sign out.
-let navigated = false;
+type Provider = 'oauth_apple' | 'oauth_google';
 
 export default function SignIn() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
   const { startSSOFlow } = useSSO();
   const { isSignedIn } = useAuth();
-  const { t } = useTranslation();
+  const save = useSaveProfile();
   const [busy, setBusy] = useState<Provider | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Pindah hanya setelah Clerk benar-benar melaporkan isSignedIn=true (bukan tepat setelah
-  // setActive), supaya layout tujuan tidak membaca isSignedIn yang masih basi.
-  // Tujuannya /home: (app)/_layout yang memutuskan — profil belum ada → onboarding,
-  // sudah ada → tab.
-  useEffect(() => {
-    if (isSignedIn) {
-      if (!navigated) {
-        navigated = true;
-        router.replace('/home');
-      }
-    } else {
-      navigated = false; // sudah sign out — izinkan login berikutnya
-    }
-  }, [isSignedIn, router]);
+  // only show the plan chip to someone who just finished the questionnaire
+  const plan = draft.plan;
+
+  /** A plan generated before sign-up is persisted the moment there's an account. */
+  const finish = async () => {
+    if (draft.plan) await save.mutateAsync();
+    router.replace('/home');
+  };
 
   const signInWith = async (strategy: Provider) => {
     if (busy) return;
     setBusy(strategy);
     setError(null);
-    let keepBusy = false;
     try {
-      // sudah login tapi masih di layar ini: navigasi sebelumnya gagal, ulangi
+      // already signed in means the save failed last time — retry just that
       if (isSignedIn) {
-        router.replace('/home');
+        await finish();
         return;
       }
 
       const { createdSessionId, setActive, signUp } = await startSSOFlow({
         strategy,
-        redirectUrl: Linking.createURL('/auth-callback', { scheme: 'almacal' }),
+        redirectUrl: Linking.createURL('/', { scheme: 'almacal' }),
       });
       if (createdSessionId && setActive) {
         await setActive({ session: createdSessionId });
-        // jangan pindah di sini — effect di atas yang menangani begitu isSignedIn true.
-        // Spinner dibiarkan menyala sampai layar ini ditutup.
-        keepBusy = true;
+        await finish();
         return;
       }
       if (signUp?.status === 'missing_requirements') {
-        setError(t('auth.errorMissingRequirements'));
+        setError('Your account needs a few more details. Please try the other provider.');
       }
       // otherwise the sheet was dismissed — stay put, say nothing
     } catch (err) {
-      setError(t('auth.errorGeneric'));
+      setError('Something went wrong. Please try again.');
       console.error('SSO error:', JSON.stringify(err, null, 2));
     } finally {
-      if (!keepBusy) setBusy(null);
+      setBusy(null);
     }
   };
 
   return (
     <View
-      className={`flex-1 ${isDark ? 'bg-[#0B0B0C]' : 'bg-[#FEFDFD]'}`}
+      className="flex-1 bg-[#FEFDFD]"
       style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}>
-      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <StatusBar style="dark" />
 
       <View className="mt-[4px] h-[24px] flex-row items-center px-[26px]">
         <Pressable onPress={() => router.back()} hitSlop={12}>
-          <SymbolView name="arrow.left" size={22} weight="medium" tintColor={isDark ? '#FFFFFF' : '#000000'} />
+          <SymbolView name="arrow.left" size={22} weight="medium" tintColor="#000000" />
         </Pressable>
       </View>
 
       <View className="flex-1 items-center justify-center px-[26px]">
         <Image
-          source={require('@/assets/images/almacal.png')}
+          source={require('@/assets/images/logo-mark.png')}
           style={{ width: 62, height: 72 }}
           contentFit="contain"
         />
-        <Text className={`mt-[26px] text-center text-[32px] font-bold leading-[38px] ${isDark ? 'text-white' : 'text-black'}`}>
-          {t('auth.welcome')}
+        <Text className="mt-[26px] text-center text-[32px] font-bold leading-[38px] text-black">
+          Save your plan
         </Text>
-        <Text className={`mt-[8px] w-[290px] text-center text-[17px] leading-[23px] ${isDark ? 'text-[#B2B2B7]' : 'text-[#4A4A52]'}`}>
-          {t('auth.subtitle')}
+        <Text className="mt-[8px] w-[290px] text-center text-[17px] leading-[23px] text-[#4A4A52]">
+          Sign in to keep your targets, streak and meal history on every device.
         </Text>
+
+        {plan ? (
+          <View className="mt-[26px] flex-row items-center rounded-full border border-[#EDEDEF] bg-white px-[18px] py-[10px]">
+            <SymbolView name="checkmark.circle.fill" size={17} tintColor="#000000" />
+            <Text className="ml-[8px] text-[15px] leading-[20px] text-[#4A4A52]">
+              Your plan is ready —{' '}
+              <Text className="font-semibold text-black">
+                {plan.calories.toLocaleString('en-US')} cal / day
+              </Text>
+            </Text>
+          </View>
+        ) : null}
       </View>
 
       <View className="px-[26px]">
@@ -117,7 +115,7 @@ export default function SignIn() {
               <>
                 <SymbolView name="apple.logo" size={19} tintColor="#FFFFFF" />
                 <Text className="ml-[10px] text-[17px] font-semibold text-white">
-                  {t('auth.continueApple')}
+                  Continue with Apple
                 </Text>
               </>
             )}
@@ -127,11 +125,11 @@ export default function SignIn() {
         <Pressable
           onPress={() => signInWith('oauth_google')}
           disabled={busy !== null}
-          className={`mt-[12px] h-[52px] flex-row items-center justify-center rounded-[15px] border ${isDark ? 'border-[#3A3A3C] bg-[#1C1C1E]' : 'border-[#DEDEE2] bg-white'} ${
+          className={`mt-[12px] h-[52px] flex-row items-center justify-center rounded-[15px] border border-[#DEDEE2] bg-white ${
             busy ? 'opacity-60' : 'active:opacity-90'
           }`}>
           {busy === 'oauth_google' ? (
-            <ActivityIndicator color={isDark ? '#FFFFFF' : '#000000'} />
+            <ActivityIndicator color="#000000" />
           ) : (
             <>
               <Image
@@ -139,8 +137,8 @@ export default function SignIn() {
                 style={{ width: 19, height: 19 }}
                 contentFit="contain"
               />
-              <Text className={`ml-[10px] text-[17px] font-semibold ${isDark ? 'text-white' : 'text-black'}`}>
-                {t('auth.continueGoogle')}
+              <Text className="ml-[10px] text-[17px] font-semibold text-black">
+                Continue with Google
               </Text>
             </>
           )}
@@ -153,7 +151,7 @@ export default function SignIn() {
         ) : null}
 
         <Text className="mb-[6px] mt-[16px] text-center text-[12px] leading-[17px] text-[#8A8A90]">
-          {t('auth.terms')}
+          By continuing you agree to our Terms of Service and Privacy Policy.
         </Text>
       </View>
     </View>

@@ -1,21 +1,18 @@
 import { useAuth } from '@clerk/expo';
-import { Ionicons } from '@react-native-vector-icons/ionicons/static';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useState, type ComponentProps } from 'react';
+import { SymbolView, type SFSymbol } from 'expo-symbols';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useSaveProfile } from '@/lib/api';
-import { answers, resetOnboarding } from '@/onboarding/steps';
+import { answers } from '@/onboarding/steps';
 
-type IconName = ComponentProps<typeof Ionicons>['name'];
-
-const FEATURES: [IconName, string, string][] = [
-  ['locate', 'Calorie Tracking', 'Track effortlessly and stay on target'],
-  ['scan', 'AI Food Scanner', 'Snap a meal, get instant nutrition'],
-  ['pie-chart', 'Macro Breakdown', 'Protein, carbs and fat for every meal'],
-  ['bar-chart', 'Progress Tracking', 'See your progress and stay motivated'],
+const FEATURES: [SFSymbol, string, string][] = [
+  ['target', 'Calorie Tracking', 'Track effortlessly and stay on target'],
+  ['viewfinder', 'AI Food Scanner', 'Snap a meal, get instant nutrition'],
+  ['chart.pie', 'Macro Breakdown', 'Protein, carbs and fat for every meal'],
+  ['chart.bar', 'Progress Tracking', 'See your progress and stay motivated'],
   ['flame', 'Daily Streaks', 'Keep your logging streak alive'],
 ];
 
@@ -24,25 +21,13 @@ export default function PlanIncludes() {
   const router = useRouter();
   const { isSignedIn } = useAuth();
   const save = useSaveProfile();
-  // dibaca sekali: answers direset setelah tersimpan, jangan sampai teks ikut berubah
-  const [target] = useState(() => answers.targetWeightKg?.toFixed(1));
+  const target = answers.targetWeightKg?.toFixed(1);
 
-  // Login sudah terjadi di awal, jadi di sini tinggal menyimpan. Kalau ternyata belum
-  // login (mis. deep link langsung ke layar ini), kembalikan ke sign-in.
-  const onContinue = () => {
-    if (!isSignedIn) {
-      router.replace('/sign-in');
-      return;
-    }
-    save.mutate(undefined, {
-      onSuccess: () => {
-        // tutup seluruh tumpukan onboarding supaya tombol back dari Home tidak kembali ke sini
-        if (router.canDismiss()) router.dismissAll();
-        router.replace('/home');
-        resetOnboarding();
-      },
-    });
-  };
+  // someone who redid onboarding is already signed in — no reason to ask again
+  const onContinue = () =>
+    isSignedIn
+      ? save.mutate(undefined, { onSuccess: () => router.replace('/home') })
+      : router.push('/sign-in');
 
   return (
     <View
@@ -52,7 +37,7 @@ export default function PlanIncludes() {
 
       <View className="mt-[4px] h-[24px] flex-row items-center px-[26px]">
         <Pressable onPress={() => router.back()} hitSlop={12}>
-          <Ionicons name="arrow-back" size={22} color="#000000" />
+          <SymbolView name="arrow.left" size={22} weight="medium" tintColor="#000000" />
         </Pressable>
         <View className="ml-[26px] flex-row gap-[10px]">
           {Array.from({ length: 4 }, (_, i) => (
@@ -74,7 +59,7 @@ export default function PlanIncludes() {
             key={title}
             className="h-[70px] flex-row items-center rounded-[14px] border border-[#EDEDEF] bg-white px-[22px]">
             <View className="w-[32px] items-center">
-              <Ionicons name={icon} size={26} color="#000000" />
+              <SymbolView name={icon} size={26} weight="regular" tintColor="#000000" />
             </View>
             <View className="ml-[20px] flex-1">
               <Text className="text-[16px] font-semibold leading-[21px] text-black">{title}</Text>

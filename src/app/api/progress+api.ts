@@ -19,6 +19,10 @@ export type ProgressResponse = {
     streak: number
     currentWeightKg: number | null
     dailyCalories: number | null
+    /** Target harian user; null kalau belum diatur. */
+    targets: { calories: number | null; proteinG: number | null; carbsG: number | null; fatG: number | null }
+    /** Satu entri per hari di rentang `days`, urut lama → baru. `logged` false = tidak ada meal. */
+    daily: { date: string; logged: boolean; calories: number; proteinG: number; carbsG: number; fatG: number }[]
     /** Satu titik per hari (log terakhir hari itu), urut lama → baru. */
     weight: { date: string; value: number }[]
     /** Satu entri per hari di rentang `days`, urut lama → baru. */
@@ -33,6 +37,8 @@ const emptyProgress = (days: number): ProgressResponse => ({
     streak: 0,
     currentWeightKg: null,
     dailyCalories: null,
+    targets: { calories: null, proteinG: null, carbsG: null, fatG: null },
+    daily: [],
     weight: [],
     consistency: [],
     loggedDates: [],
@@ -69,6 +75,9 @@ export async function GET(request: Request) {
             timezone: users.timezone,
             weightKg: users.weightKg,
             dailyCalories: users.dailyCalories,
+            proteinG: users.proteinG,
+            carbsG: users.carbsG,
+            fatG: users.fatG,
         })
         .from(users)
         .where(eq(users.clerkUserId, clerkUserId))
@@ -88,6 +97,9 @@ export async function GET(request: Request) {
             .select({
                 date: mealDay,
                 calories: sql<number>`coalesce(sum(${meals.calories}), 0)::int`,
+                proteinG: sql<number>`coalesce(sum(${meals.proteinG}), 0)::int`,
+                carbsG: sql<number>`coalesce(sum(${meals.carbsG}), 0)::int`,
+                fatG: sql<number>`coalesce(sum(${meals.fatG}), 0)::int`,
             })
             .from(meals)
             .where(
@@ -116,6 +128,7 @@ export async function GET(request: Request) {
     const weight = [...weightByDate].map(([date, value]) => ({ date, value }))
 
     const caloriesByDate = new Map(mealRows.map((r) => [r.date, r.calories]))
+    const mealsByDate = new Map(mealRows.map((r) => [r.date, r]))
     const target = user.dailyCalories
 
     const consistency = Array.from({ length: days }, (_, i) => {
@@ -139,12 +152,32 @@ export async function GET(request: Request) {
         cursor = shiftDate(cursor, -1)
     }
 
+    const daily = Array.from({ length: days }, (_, i) => {
+        const date = shiftDate(rangeStart, i)
+        const row = mealsByDate.get(date)
+        return {
+            date,
+            logged: !!row,
+            calories: row?.calories ?? 0,
+            proteinG: row?.proteinG ?? 0,
+            carbsG: row?.carbsG ?? 0,
+            fatG: row?.fatG ?? 0,
+        }
+    })
+
     const body: ProgressResponse = {
         days,
         today,
         streak,
         currentWeightKg: user.weightKg,
         dailyCalories: target,
+        targets: {
+            calories: target,
+            proteinG: user.proteinG,
+            carbsG: user.carbsG,
+            fatG: user.fatG,
+        },
+        daily,
         weight,
         consistency,
         loggedDates: [...caloriesByDate.keys()].sort(),

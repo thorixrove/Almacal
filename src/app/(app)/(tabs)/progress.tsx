@@ -6,8 +6,10 @@ import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { CaloriesCard } from "@/components/calories-card";
 import { ConsistencyCard } from "@/components/consistency-card";
 import { LogWeightModal } from "@/components/log-weight-modal";
+import { MacrosCard } from "@/components/macros-card";
 import { StreakCalendarCard } from "@/components/streak-calendar-card";
 import { WeightTrendCard, type WeightPoint } from "@/components/weight-chart";
 import { BottomTabInset } from "@/constants/theme";
@@ -71,19 +73,6 @@ export function ProgressCard({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Placeholder({ title }: { title: string }) {
-  const { t } = useTranslation();
-
-  return (
-    <ProgressCard>
-      <Text className="text-[16px] font-semibold text-black dark:text-white">{title}</Text>
-      <Text className="mt-[6px] text-[13px] text-[#8A8A90] dark:text-[#9A9AA0]">
-        {t("progress.comingSoon")}
-      </Text>
-    </ProgressCard>
-  );
-}
-
 export default function Progress() {
   const insets = useSafeAreaInsets();
   const { colorScheme } = useColorScheme();
@@ -134,13 +123,13 @@ export default function Progress() {
 
         <SegmentedTabs value={tab} onChange={setTab} />
 
-        {tab === "weight" && isPending ? (
+        {isPending ? (
           <View className="mt-[60px] items-center">
             <ActivityIndicator color={theme.text} />
           </View>
         ) : null}
 
-        {tab === "weight" && isError ? (
+        {isError ? (
           <ProgressCard>
             <Text className="text-[16px] font-semibold text-black dark:text-white">
               {t("progress.loadError")}
@@ -169,8 +158,19 @@ export default function Progress() {
             />
           </>
         ) : null}
-        {tab === "calories" ? <Placeholder title={t("progress.tabs.calories")} /> : null}
-        {tab === "macros" ? <Placeholder title={t("progress.tabs.macros")} /> : null}
+        {tab === "calories" && data ? (
+          <CaloriesCard daily={data.daily ?? []} target={data.targets?.calories ?? null} />
+        ) : null}
+        {tab === "macros" && data ? (
+          <MacrosCard
+            daily={data.daily ?? []}
+            targets={{
+              proteinG: data.targets?.proteinG ?? null,
+              carbsG: data.targets?.carbsG ?? null,
+              fatG: data.targets?.fatG ?? null,
+            }}
+          />
+        ) : null}
       </ScrollView>
 
       <LogWeightModal visible={logOpen} onClose={() => setLogOpen(false)} />

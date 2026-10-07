@@ -45,7 +45,7 @@ const DRAG_TO_CLOSE_VELOCITY = 1.2
 
 export type DetailMeal = {
     id: string;
-    imageUrl: string;
+    imageUrl: string | null;
     status: 'analyzing' | 'completed' | 'failed';
     name: string | null;
     calories: number;
@@ -133,12 +133,18 @@ export function MealDetailSheet({
                                 contentContainerStyle={{ paddingHorizontal: 22, paddingBottom: insets.bottom + 22 }}
                             >
                                 <View className="mt-[14px] flex-row items-center">
-                                    <Image
-                                        source={{ uri: thumbnail(meal.imageUrl, 64) }}
-                                        style={{ width: 64, height: 64, borderRadius: 18 }}
-                                        contentFit="cover"
-                                        transition={200}
-                                    />
+                                    <View className="h-[64px] w-[64px] items-center justify-center overflow-hidden rounded-[18px] bg-[#F3F3F7] dark:bg-[#2C2C2E]">
+                                        {meal.imageUrl ? (
+                                            <Image
+                                                source={{ uri: thumbnail(meal.imageUrl, 64) }}
+                                                style={{ width: 64, height: 64 }}
+                                                contentFit="cover"
+                                                transition={200}
+                                            />
+                                        ) : (
+                                            <Ionicons name="restaurant-outline" size={24} color="#8A8A90" />
+                                        )}
+                                    </View>
                                     <View className="ml-[14px] flex-1">
                                         <Text numberOfLines={2} className="text-[18px] font-bold text-black dark:text-white">
                                             {meal.status === 'completed'

@@ -19,7 +19,9 @@ export type ProgressResponse = {
     streak: number
     currentWeightKg: number | null
     dailyCalories: number | null
+    /** Target harian user; null kalau belum diatur. */
     targets: { calories: number | null; proteinG: number | null; carbsG: number | null; fatG: number | null }
+    /** Satu entri per hari di rentang `days`, urut lama → baru. `logged` false = tidak ada meal. */
     daily: { date: string; logged: boolean; calories: number; proteinG: number; carbsG: number; fatG: number }[]
     /** Satu titik per hari (log terakhir hari itu), urut lama → baru. */
     weight: { date: string; value: number }[]

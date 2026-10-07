@@ -1,8 +1,9 @@
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { Image } from "expo-image";
+import { useFocusEffect } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "nativewind";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -16,11 +17,14 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 
-import { useFoods, type FoodCategory, type FoodItem } from "@/lib/api";
+import { MealDetailSheet, type DetailMeal } from "@/components/meal-detail-sheet";
+import { useDeleteMeal, useFoods, useProfile, type FoodCategory, type FoodItem } from "@/lib/api";
+import { proxyImage } from "@/lib/image-proxy";
 import { useThemeColors } from "@/lib/theme";
 
 const TAB_BAR = Platform.select({ ios: 49, default: 80 });
 const THUMB = 56;
+const CHIP_HEIGHT = 36;
 
 // `null` = chip "All" (tanpa filter kategori).
 const CATEGORIES: { key: FoodCategory | null; label: string }[] = [
@@ -29,11 +33,9 @@ const CATEGORIES: { key: FoodCategory | null; label: string }[] = [
   { key: "lunch", label: "Lunch" },
   { key: "dinner", label: "Dinner" },
   { key: "snacks", label: "Snacks" },
-  { key: "shakes", label: "Shakes" },
 ];
 
-const thumbnail = (url: string) =>
-  url.includes("images.unsplash.com") ? `${url}?w=${THUMB * 3}&h=${THUMB * 3}&fit=crop&q=70` : url;
+const thumbnail = (url: string) => `${proxyImage(url)}?tr=w-${THUMB * 3},h-${THUMB * 3},q-70`;
 
 /** Nilai yang baru ikut berubah setelah `delay` ms tanpa perubahan — supaya tidak fetch tiap huruf. */
 function useDebounced<T>(value: T, delay = 300) {
@@ -45,7 +47,7 @@ function useDebounced<T>(value: T, delay = 300) {
   return debounced;
 }
 
-export default function Foods() {
+export default function Food() {
   const insets = useSafeAreaInsets();
   const { colorScheme } = useColorScheme();
   const theme = useThemeColors();
@@ -54,9 +56,37 @@ export default function Foods() {
 
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<FoodCategory | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const query = useDebounced(search);
   const { data, isPending, isError, isFetching, refetch } = useFoods(query, category ?? undefined);
+  const { data: profile } = useProfile();
+  const deleteMeal = useDeleteMeal();
+
+  // Tab tetap ter-mount di belakang, jadi scan baru tidak akan muncul tanpa refetch saat tab dibuka.
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
+
+  const selected = data?.find((f) => f.id === selectedId) ?? null;
+  const detail: DetailMeal | null = selected
+    ? {
+        id: selected.id,
+        imageUrl: selected.imageUrl,
+        status: "completed",
+        name: selected.name,
+        calories: selected.calories ?? 0,
+        protein: selected.proteinG ?? 0,
+        carbs: selected.carbsG ?? 0,
+        fat: selected.fatG ?? 0,
+        errorReason: null,
+        loggedAt: new Date(selected.loggedAt),
+      }
+    : null;
+
+  const filtering = !!query.trim() || category !== null;
 
   return (
     <View
@@ -97,12 +127,13 @@ export default function Foods() {
         ) : null}
       </View>
 
+      {/* Tinggi dikunci: ScrollView horizontal di dalam kolom flex bisa terjepit dan memotong chip. */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
-        className="mt-[14px] flex-grow-0"
-        contentContainerStyle={{ paddingHorizontal: 22, gap: 8 }}
+        style={{ flexGrow: 0, flexShrink: 0, height: CHIP_HEIGHT, marginTop: 14 }}
+        contentContainerStyle={{ paddingHorizontal: 22, gap: 8, alignItems: "center" }}
       >
         {CATEGORIES.map((c) => {
           const active = c.key === category;
@@ -110,7 +141,8 @@ export default function Foods() {
             <Pressable
               key={c.label}
               onPress={() => setCategory(c.key)}
-              className={`h-[36px] justify-center rounded-full border px-[16px] active:opacity-70 ${
+              style={{ height: CHIP_HEIGHT }}
+              className={`justify-center rounded-full border px-[16px] active:opacity-70 ${
                 active
                   ? "border-black bg-black dark:border-white dark:bg-white"
                   : "border-[#EDEDEF] bg-white dark:border-[#2C2C2E] dark:bg-[#1C1C1E]"
@@ -135,7 +167,7 @@ export default function Foods() {
       ) : isError ? (
         <View className="flex-1 items-center justify-center px-[40px]">
           <Text className="text-center text-[15px] leading-[20px] text-[#6E6E78] dark:text-[#9A9AA0]">
-            {t("foods.loadError", "We couldn't load the foods.")}
+            {t("foods.loadError", "We couldn't load your foods.")}
           </Text>
           <Pressable
             onPress={() => refetch()}
@@ -153,60 +185,73 @@ export default function Foods() {
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
           showsVerticalScrollIndicator={false}
+          style={{ marginTop: 6 }}
           contentContainerStyle={{
             paddingHorizontal: 22,
-            paddingTop: 8,
             paddingBottom: insets.bottom + TAB_BAR + 28,
           }}
-          renderItem={({ item }) => <FoodRow food={item} />}
+          renderItem={({ item }) => <FoodRow food={item} onPress={() => setSelectedId(item.id)} />}
           ListEmptyComponent={
             <View className="mt-[40px] items-center rounded-[20px] bg-[#F3F3F7] px-[18px] py-[24px] dark:bg-[#1C1C1E]">
               <View className="h-[46px] w-[46px] items-center justify-center rounded-full bg-white dark:bg-[#2C2C2E]">
                 <Ionicons name="search" size={20} color="#B4B4BC" />
               </View>
               <Text className="mt-[14px] text-center text-[15px] leading-[20px] text-[#6E6E78] dark:text-[#9A9AA0]">
-                {t("foods.empty", "No foods found. Try a different search.")}
+                {filtering
+                  ? t("foods.noResults", "No scanned foods match your search.")
+                  : t("foods.empty", "No scanned foods yet. Scan a meal and it will show up here.")}
               </Text>
             </View>
           }
         />
       )}
+
+      <MealDetailSheet
+        meal={detail}
+        onClose={() => setSelectedId(null)}
+        deleting={deleteMeal.isPending}
+        dailyTarget={{
+          protein: profile?.proteinG ?? 0,
+          carbs: profile?.carbsG ?? 0,
+          fat: profile?.fatG ?? 0,
+        }}
+        onDelete={(id) => deleteMeal.mutate(id, { onSuccess: () => setSelectedId(null) })}
+      />
     </View>
   );
 }
 
-function FoodRow({ food }: { food: FoodItem }) {
+function FoodRow({ food, onPress }: { food: FoodItem; onPress: () => void }) {
   const theme = useThemeColors();
 
   return (
-    // Detail makanan (dan tombol "log") menyusul — sementara baris belum bisa ditekan.
-    <View className="flex-row items-center py-[12px]">
-      {food.imageUrl ? (
-        <Image
-          source={{ uri: thumbnail(food.imageUrl) }}
-          style={{ width: THUMB, height: THUMB, borderRadius: THUMB / 2 }}
-          contentFit="cover"
-          transition={200}
-        />
-      ) : (
-        <View
-          className="items-center justify-center bg-[#F3F3F7] dark:bg-[#2C2C2E]"
-          style={{ width: THUMB, height: THUMB, borderRadius: THUMB / 2 }}
-        >
-          <Ionicons name="restaurant" size={22} color="#B4B4BC" />
-        </View>
-      )}
+    <Pressable onPress={onPress} className="flex-row items-center py-[12px] active:opacity-60">
+      <View
+        className="items-center justify-center overflow-hidden rounded-full"
+        style={{ width: THUMB, height: THUMB, backgroundColor: theme.cardBg }}
+      >
+        {food.imageUrl ? (
+          <Image
+            source={{ uri: thumbnail(food.imageUrl) }}
+            style={{ width: THUMB, height: THUMB }}
+            contentFit="cover"
+            transition={200}
+          />
+        ) : (
+          <Ionicons name="restaurant-outline" size={22} color={theme.chevron} />
+        )}
+      </View>
 
       <View className="ml-[14px] flex-1">
         <Text numberOfLines={1} className="text-[16px] font-semibold text-black dark:text-white">
           {food.name}
         </Text>
         <Text className="mt-[3px] text-[13px] text-[#8A8A90] dark:text-[#9A9AA0]">
-          {food.calories} Cal • {food.proteinG}g Protein
+          {food.calories ?? 0} Cal • {food.proteinG ?? 0}g Protein
         </Text>
       </View>
 
       <Ionicons name="chevron-forward" size={18} color={theme.chevron} />
-    </View>
+    </Pressable>
   );
 }

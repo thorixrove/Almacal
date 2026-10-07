@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 // Type-only: the schema file pulls in zod, which the app bundle doesn't need.
 import type { Plan, PlanInput } from '@/lib/plan';
-import type { Food, Meal, User } from '@/db/schema';
+import type { Meal, User } from '@/db/schema';
 import type { ProgressResponse } from '@/app/api/progress+api';
 import { answers, draft } from '@/onboarding/steps';
 
@@ -183,6 +183,7 @@ export type DayMeal = Pick<
 > & { loggedAt: string };
 
 export const MEALS_KEY = ['meals'];
+export const FOODS_KEY = ['foods'];
 
 /** Meals for one local calendar day, `YYYY-MM-DD` in the user's own timezone. */
 export function useMeals(date: string) {
@@ -281,7 +282,10 @@ export function useDeleteMeal() {
 
       if (!response.ok) throw new Error(`Could not delete this meal (${response.status})`)
     },
-  onSuccess: () => queryClient.invalidateQueries({ queryKey: MEALS_KEY}),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: MEALS_KEY })
+    queryClient.invalidateQueries({ queryKey: FOODS_KEY })
+  },
   onError: (error) =>
     Sentry.logger.error('Meal delete failed', { reason: String(error)})
   })
@@ -309,7 +313,10 @@ export function useLogMeal() {
       return response.json();
     },
     // Home stays mounted behind the native tabs, so nothing else would make it refetch.
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: MEALS_KEY }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: MEALS_KEY });
+      queryClient.invalidateQueries({ queryKey: FOODS_KEY });
+    },
     // `image` is the base64 payload — its length is the one attribute that tells a
     // failed upload apart from a photo too big to survive the round trip.
     onError: (error, image) =>
@@ -321,24 +328,22 @@ export function useLogMeal() {
 }
 
 
-/** Satu baris di halaman Foods. */
+/** Satu baris di halaman Foods = satu makanan yang sudah di-scan. */
 export type FoodItem = Pick<
-  Food,
-  'id' | 'name' | 'category' | 'imageUrl' | 'calories' | 'proteinG' | 'carbsG' | 'fatG' | 'servingNote'
->;
+  DayMeal,
+  'id' | 'name' | 'calories' | 'proteinG' | 'carbsG' | 'fatG' | 'loggedAt'
+> & { imageUrl: string | null };
 
-export type FoodCategory = FoodItem['category'];
+/** Kategori diturunkan dari jam scan di server (lihat api/foods+api.ts). */
+export type FoodCategory = 'breakfast' | 'lunch' | 'dinner' | 'snacks';
 
-export const FOODS_KEY = ['foods'];
-
-/** Katalog makanan. `query` kosong = semua; `category` undefined = semua kategori ("All"). */
+/** Makanan yang sudah di-scan. `query` kosong = semua; `category` undefined = semua ("All"). */
 export function useFoods(query: string, category?: FoodCategory) {
   const { getToken, isSignedIn } = useAuth();
 
   return useQuery({
     queryKey: [...FOODS_KEY, query, category ?? 'all'],
     enabled: !!isSignedIn,
-    staleTime: 5 * 60_000, // katalog jarang berubah
     // Tetap tampilkan hasil sebelumnya selama hasil baru dimuat, supaya list tidak berkedip tiap ketik.
     placeholderData: (previous) => previous,
     queryFn: async (): Promise<FoodItem[]> => {
@@ -350,7 +355,7 @@ export function useFoods(query: string, category?: FoodCategory) {
         headers: { Authorization: `Bearer ${await getToken()}` },
       });
 
-      if (!response.ok) throw new Error(`Could not load foods (${response.status})`);
+      if (!response.ok) throw new Error(`Could not load your foods (${response.status})`);
       return response.json();
     },
   });

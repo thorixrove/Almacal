@@ -1,41 +1,18 @@
 import { useAuth } from '@clerk/expo';
-import { Redirect, Stack } from 'expo-router';
+import { Redirect } from 'expo-router';
+import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
 import { useProfile } from '@/lib/api';
-import { useEffect } from 'react';
-import { colorScheme } from 'nativewind';
-import { ThemePreference } from '@/lib/theme';
 
 export default function AppLayout() {
-    const { isLoaded, isSignedIn } = useAuth();
-    const { data: profile, isPending, isError, refetch } = useProfile();
-
-    // TEMP DEBUG — hapus setelah gerbang onboarding terbukti jalan
-    console.log('[gate]', JSON.stringify({
-        isLoaded,
-        isSignedIn,
-        isPending,
-        isError,
-        onboardedAt: profile?.onboardingCompletedAt ?? null,
-    }));
-
-    useEffect(() => {
-        if (profile?.themePreference) colorScheme.set(profile.themePreference as ThemePreference)
-    }, [profile?.themePreference])
+    const { isLoaded, isSignedIn } = useAuth()
+    const { data: profile, isPending, isError, refetch } = useProfile()
 
 
-    console.log('[gate]', JSON.stringify({
-        isLoaded,
-        isSignedIn,
-        isPending,
-        isError,
-        onboardedAt: profile?.onboardingCompletedAt ?? null,
-    }))
-
-    if (!isLoaded) return null;
-    if (!isSignedIn) return <Redirect href="/sign-in" />;
-    if (isPending) return <Centered />;
+    if (!isLoaded) return null
+    if (!isSignedIn) return <Redirect href="/" />
+    if (isPending) return <Centered />
 
     if (isError) {
         return (
@@ -47,22 +24,43 @@ export default function AppLayout() {
                     onPress={() => refetch()}
                     className="mt-[16px] h-[44px] items-center justify-center rounded-full bg-black px-[26px] active:opacity-90"
                 >
-                    <Text className="text-[15px] font-semibold text-white">Retry</Text>
+                    <Text className="text-[15px] font-semibold text-white"></Text>
                 </Pressable>
             </Centered>
-        );
+        )
     }
 
-    // Login sudah terjadi di awal; user baru (belum ada profil) diarahkan mengisi biodata.
     if (!profile?.onboardingCompletedAt) {
-        return <Redirect href={{ pathname: '/onboarding/[step]', params: { step: 'gender' } }} />;
+        return <Redirect href={{ pathname: '/onboarding/[step]', params: { step: 'gender' } }} />
     }
 
-    // Expo Router auto-discovers every route under this folder — (tabs) as the
-    // tab-bar group, personal-details/index and personal-details/[field] as
-    // ordinary pushed screens on top of it. No need to list them by hand unless
-    // a screen needs custom options (e.g. presentation: 'modal').
-    return <Stack screenOptions={{ headerShown: false }} />;
+    return (
+        <NativeTabs
+            backgroundColor="#FEFDFD"
+            tintColor="#000000"
+            iconColor={{ default: '#9A9AA0', selected: '#000000' }}
+            labelStyle={{ default: { color: '#9A9AA0' }, selected: { color: '#000000' } }}
+            disableTransparentOnScrollEdge
+        >
+            <NativeTabs.Trigger name='home'>
+                <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
+                <NativeTabs.Trigger.Icon
+                    sf={{ default: 'house', selected: 'house.fill' }}
+                    md={{ default: 'home', selected: 'home_filled' }}
+                />
+            </NativeTabs.Trigger>
+
+            <NativeTabs.Trigger name='camera'>
+                <NativeTabs.Trigger.Label>Scan</NativeTabs.Trigger.Label>
+                <NativeTabs.Trigger.Icon sf="camera.fill" md="photo_camera" />
+            </NativeTabs.Trigger>
+
+            <NativeTabs.Trigger name='Profile'>
+                <NativeTabs.Trigger.Label>Profile</NativeTabs.Trigger.Label>
+                <NativeTabs.Trigger.Icon sf={{ default: 'person', selected: 'person.fill' }} md="person" />
+            </NativeTabs.Trigger>
+        </NativeTabs>
+    )
 }
 
 function Centered({ children }: { children?: React.ReactNode }) {
@@ -70,5 +68,5 @@ function Centered({ children }: { children?: React.ReactNode }) {
         <View className="flex-1 items-center justify-center bg-[#FEFDFD] px-[40px]">
             {children ?? <ActivityIndicator color="#000000" />}
         </View>
-    );
+    )
 }

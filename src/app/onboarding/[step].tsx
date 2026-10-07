@@ -151,7 +151,6 @@ export default function OnboardingStep() {
                             subtitle={o.subtitle}
                             icon={o.icon}
                             glyph={o.glyph}
-                            vectorIcon={o.vectorIcon}
                             tall={step.tall}
                             selected={value === o.value}
                             onPress={() => commit(o.value)}

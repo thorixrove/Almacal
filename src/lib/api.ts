@@ -337,12 +337,41 @@ export type FoodItem = Pick<
 /** Kategori diturunkan dari jam scan di server (lihat api/foods+api.ts). */
 export type FoodCategory = 'breakfast' | 'lunch' | 'dinner' | 'snacks';
 
+export type FoodSort = 'newest' | 'oldest' | 'calories' | 'protein';
+
+/** Filter dari panel di halaman Foods. `null` = tidak difilter. */
+export type FoodFilters = {
+  sort: FoodSort;
+  /** 1 = hari ini, 7 = 7 hari terakhir, 30 = 30 hari terakhir. */
+  days: number | null;
+  minProtein: number | null;
+  minCalories: number | null;
+  maxCalories: number | null;
+};
+
+export const DEFAULT_FOOD_FILTERS: FoodFilters = {
+  sort: 'newest',
+  days: null,
+  minProtein: null,
+  minCalories: null,
+  maxCalories: null,
+};
+
+/** Jumlah filter yang sedang aktif (untuk penanda di ikon filter). */
+export const countActiveFilters = (f: FoodFilters) =>
+  [f.sort !== 'newest', f.days !== null, f.minProtein !== null, f.minCalories !== null || f.maxCalories !== null]
+    .filter(Boolean).length;
+
 /** Makanan yang sudah di-scan. `query` kosong = semua; `category` undefined = semua ("All"). */
-export function useFoods(query: string, category?: FoodCategory) {
+export function useFoods(
+  query: string,
+  category?: FoodCategory,
+  filters: FoodFilters = DEFAULT_FOOD_FILTERS,
+) {
   const { getToken, isSignedIn } = useAuth();
 
   return useQuery({
-    queryKey: [...FOODS_KEY, query, category ?? 'all'],
+    queryKey: [...FOODS_KEY, query, category ?? 'all', filters],
     enabled: !!isSignedIn,
     // Tetap tampilkan hasil sebelumnya selama hasil baru dimuat, supaya list tidak berkedip tiap ketik.
     placeholderData: (previous) => previous,
@@ -350,6 +379,11 @@ export function useFoods(query: string, category?: FoodCategory) {
       const params = new URLSearchParams();
       if (query.trim()) params.set('q', query.trim());
       if (category) params.set('category', category);
+      if (filters.sort !== 'newest') params.set('sort', filters.sort);
+      if (filters.days !== null) params.set('days', String(filters.days));
+      if (filters.minProtein !== null) params.set('minProtein', String(filters.minProtein));
+      if (filters.minCalories !== null) params.set('minCalories', String(filters.minCalories));
+      if (filters.maxCalories !== null) params.set('maxCalories', String(filters.maxCalories));
 
       const response = await fetch(`/api/foods?${params}`, {
         headers: { Authorization: `Bearer ${await getToken()}` },

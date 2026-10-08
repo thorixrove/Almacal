@@ -213,5 +213,55 @@
       "value": "{{avg}} / {{target}} g",
       "valueNoTarget": "{{avg}} g"
     }
+  },
+  "foods": {
+    "title": "Makanan",
+    "searchPlaceholder": "Cari makanan...",
+    "categories": {
+      "all": "Semua",
+      "breakfast": "Sarapan",
+      "lunch": "Makan siang",
+      "dinner": "Makan malam",
+      "snacks": "Camilan"
+    },
+    "rowMacros": "{{calories}} kkal • {{protein}}g Protein",
+    "loadError": "Gagal memuat makanan Anda.",
+    "retry": "Coba lagi",
+    "noResults": "Tidak ada makanan yang cocok dengan pencarian atau filter Anda.",
+    "empty": "Belum ada makanan yang dipindai. Pindai makanan dan hasilnya akan muncul di sini.",
+    "filter": {
+      "title": "Filter",
+      "sort": "Urutkan",
+      "sorts": {
+        "newest": "Terbaru",
+        "oldest": "Terlama",
+        "calories": "Kalori tertinggi",
+        "protein": "Protein tertinggi"
+      },
+      "date": "Waktu pindai",
+      "days": {
+        "any": "Kapan saja",
+        "1": "Hari ini",
+        "7": "7 hari terakhir",
+        "30": "30 hari terakhir"
+      },
+      "protein": "Protein minimal",
+      "proteins": {
+        "any": "Semua",
+        "10": "10g+",
+        "20": "20g+",
+        "30": "30g+",
+        "40": "40g+"
+      },
+      "calories": "Kalori",
+      "calorieRanges": {
+        "any": "Semua",
+        "under300": "Di bawah 300",
+        "300to600": "300–600",
+        "over600": "Di atas 600"
+      },
+      "reset": "Atur ulang",
+      "apply": "Terapkan"
+    }
   }
 }

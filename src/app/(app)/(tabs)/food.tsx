@@ -17,8 +17,18 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 
+import { FoodFilterSheet } from "@/components/food-filter-sheet";
 import { MealDetailSheet, type DetailMeal } from "@/components/meal-detail-sheet";
-import { useDeleteMeal, useFoods, useProfile, type FoodCategory, type FoodItem } from "@/lib/api";
+import {
+  DEFAULT_FOOD_FILTERS,
+  countActiveFilters,
+  useDeleteMeal,
+  useFoods,
+  useProfile,
+  type FoodCategory,
+  type FoodFilters,
+  type FoodItem,
+} from "@/lib/api";
 import { proxyImage } from "@/lib/image-proxy";
 import { useThemeColors } from "@/lib/theme";
 
@@ -57,9 +67,11 @@ export default function Food() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<FoodCategory | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [filters, setFilters] = useState<FoodFilters>(DEFAULT_FOOD_FILTERS)
+  const [filterOpen, setFilterOpen] = useState(false)
 
   const query = useDebounced(search);
-  const { data, isPending, isError, isFetching, refetch } = useFoods(query, category ?? undefined);
+  const { data, isPending, isError, isFetching, refetch } = useFoods(query, category ?? undefined, filters);
   const { data: profile } = useProfile();
   const deleteMeal = useDeleteMeal();
 
@@ -73,20 +85,21 @@ export default function Food() {
   const selected = data?.find((f) => f.id === selectedId) ?? null;
   const detail: DetailMeal | null = selected
     ? {
-        id: selected.id,
-        imageUrl: selected.imageUrl,
-        status: "completed",
-        name: selected.name,
-        calories: selected.calories ?? 0,
-        protein: selected.proteinG ?? 0,
-        carbs: selected.carbsG ?? 0,
-        fat: selected.fatG ?? 0,
-        errorReason: null,
-        loggedAt: new Date(selected.loggedAt),
-      }
+      id: selected.id,
+      imageUrl: selected.imageUrl,
+      status: "completed",
+      name: selected.name,
+      calories: selected.calories ?? 0,
+      protein: selected.proteinG ?? 0,
+      carbs: selected.carbsG ?? 0,
+      fat: selected.fatG ?? 0,
+      errorReason: null,
+      loggedAt: new Date(selected.loggedAt),
+    }
     : null;
 
-  const filtering = !!query.trim() || category !== null;
+  const activeFilters = countActiveFilters(filters);
+  const filtering = !!query.trim() || category !== null || activeFilters > 0;
 
   return (
     <View
@@ -95,14 +108,16 @@ export default function Food() {
       style={{ paddingTop: insets.top }}
     >
       <StatusBar style={isDark ? "light" : "dark"} />
-
       <View className="mt-[10px] flex-row items-center px-[22px]">
         <Text className="flex-1 text-[26px] font-bold tracking-[-0.6px] text-black dark:text-white">
           {t("foods.title", "Foods")}
         </Text>
-        {/* Placeholder sesuai desain — belum ada fungsinya. */}
-        <Pressable hitSlop={10} className="active:opacity-60">
+        <Pressable onPress={() => setFilterOpen(true)} hitSlop={10} className="active:opacity-60">
           <Ionicons name="options-outline" size={22} color={theme.icon} />
+          {/* Titik penanda: ada filter (urutan/tanggal/protein/kalori) yang aktif. */}
+          {activeFilters > 0 ? (
+            <View className="absolute -right-[3px] -top-[3px] h-[9px] w-[9px] rounded-full bg-[#F0524A]" />
+          ) : null}
         </Pressable>
       </View>
 
@@ -142,16 +157,14 @@ export default function Food() {
               key={c.label}
               onPress={() => setCategory(c.key)}
               style={{ height: CHIP_HEIGHT }}
-              className={`justify-center rounded-full border px-[16px] active:opacity-70 ${
-                active
-                  ? "border-black bg-black dark:border-white dark:bg-white"
-                  : "border-[#EDEDEF] bg-white dark:border-[#2C2C2E] dark:bg-[#1C1C1E]"
-              }`}
+              className={`justify-center rounded-full border px-[16px] active:opacity-70 ${active
+                ? "border-black bg-black dark:border-white dark:bg-white"
+                : "border-[#EDEDEF] bg-white dark:border-[#2C2C2E] dark:bg-[#1C1C1E]"
+                }`}
             >
               <Text
-                className={`text-[14px] font-medium ${
-                  active ? "text-white dark:text-black" : "text-black dark:text-white"
-                }`}
+                className={`text-[14px] font-medium ${active ? "text-white dark:text-black" : "text-black dark:text-white"
+                  }`}
               >
                 {t(`foods.categories.${c.key ?? "all"}`, c.label)}
               </Text>
@@ -205,6 +218,16 @@ export default function Food() {
           }
         />
       )}
+
+      <FoodFilterSheet
+      visible={filterOpen}
+      filters={filters}
+      onApply={(next) => {
+        setFilters(next)
+        setFilterOpen(false)
+      }}
+      onClose={() => setFilterOpen(false)}
+      />
 
       <MealDetailSheet
         meal={detail}

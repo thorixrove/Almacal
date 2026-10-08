@@ -213,5 +213,55 @@
       "value": "{{avg}} / {{target}} g",
       "valueNoTarget": "{{avg}} g"
     }
+  },
+  "foods": {
+    "title": "Foods",
+    "searchPlaceholder": "Search foods...",
+    "categories": {
+      "all": "All",
+      "breakfast": "Breakfast",
+      "lunch": "Lunch",
+      "dinner": "Dinner",
+      "snacks": "Snacks"
+    },
+    "rowMacros": "{{calories}} Cal • {{protein}}g Protein",
+    "loadError": "We couldn't load your foods.",
+    "retry": "Retry",
+    "noResults": "No scanned foods match your search or filters.",
+    "empty": "No scanned foods yet. Scan a meal and it will show up here.",
+    "filter": {
+      "title": "Filter",
+      "sort": "Sort by",
+      "sorts": {
+        "newest": "Newest",
+        "oldest": "Oldest",
+        "calories": "Highest calories",
+        "protein": "Highest protein"
+      },
+      "date": "Scanned",
+      "days": {
+        "any": "Any time",
+        "1": "Today",
+        "7": "Last 7 days",
+        "30": "Last 30 days"
+      },
+      "protein": "Minimum protein",
+      "proteins": {
+        "any": "Any",
+        "10": "10g+",
+        "20": "20g+",
+        "30": "30g+",
+        "40": "40g+"
+      },
+      "calories": "Calories",
+      "calorieRanges": {
+        "any": "Any",
+        "under300": "Under 300",
+        "300to600": "300–600",
+        "over600": "Over 600"
+      },
+      "reset": "Reset",
+      "apply": "Apply"
+    }
   }
 }
